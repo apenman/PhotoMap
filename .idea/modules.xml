@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/PhotoMap/PhotoMap.iml" filepath="$PROJECT_DIR$/PhotoMap/PhotoMap.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PhotoMapProject.iml" filepath="$PROJECT_DIR$/PhotoMapProject.iml" />
+    </modules>
+  </component>
+</project>
+
