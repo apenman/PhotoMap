@@ -40,8 +40,6 @@ public class ImageData implements Serializable {
 //
 //                System.out.println("LATITUDE = " + LATITUDE);
 //                System.out.println("LONGITUDE = " + LONGITUDE);
-                String dateString = exif.getAttribute(ExifInterface.TAG_DATETIME);
-                System.out.println("DATE: " + dateString);
             }else
             {
                 System.out.println("WAS NULL");

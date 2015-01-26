@@ -1,7 +1,9 @@
 package com.apenman.photomap;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Calendar;
-
+import android.media.ExifInterface;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -36,11 +38,14 @@ public class MainActivity extends Activity implements
     // Variable for storing current date and time
     private int mYearFrom, mMonthFrom, mDayFrom, mHourFrom, mMinuteFrom;
     private int mYearTo, mMonthTo, mDayTo, mHourTo, mMinuteTo;
+    private Date dateFrom = new Date();
+    private Date dateTo = new Date();
+//    private long longFrom = dateFrom.getTime();
+//    private long longTo = dateTo.getTime();
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        System.out.println("STARTING WOOO");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -86,8 +91,15 @@ public class MainActivity extends Activity implements
                         public void onDateSet(DatePicker view, int year,
                                               int monthOfYear, int dayOfMonth) {
                             // Display Selected date in textbox
-                            txtDateFrom.setText(monthOfYear + 1 + "-"
-                                    + (dayOfMonth + 1) + "-" + year);
+                            String dateStr = monthOfYear + 1 + "-"
+                                    + (dayOfMonth + 1) + "-" + year;
+                            txtDateFrom.setText(dateStr);
+                            SimpleDateFormat  format = new SimpleDateFormat("MM-dd-yyyy");
+                            try {
+                                dateFrom = format.parse(dateStr);
+                            } catch(ParseException e) {
+                                e.printStackTrace();
+                            }
 
                         }
                     }, mYearFrom, mMonthFrom, mDayFrom);
@@ -110,9 +122,15 @@ public class MainActivity extends Activity implements
                         public void onDateSet(DatePicker view, int year,
                                               int monthOfYear, int dayOfMonth) {
                             // Display Selected date in textbox
-                            txtDateTo.setText(monthOfYear + 1 + "-"
-                                    + (dayOfMonth + 1) + "-" + year);
-
+                            String dateStr = monthOfYear + 1 + "-"
+                                    + (dayOfMonth + 1) + "-" + year;
+                            txtDateTo.setText(dateStr);
+                            SimpleDateFormat  format = new SimpleDateFormat("MM-dd-yyyy");
+                            try {
+                                dateTo = format.parse(dateStr);
+                            } catch(ParseException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }, mYearTo, mMonthTo, mDayTo);
             dpd.show();
@@ -151,26 +169,56 @@ public class MainActivity extends Activity implements
         String as[] = {
                 "_data"
         };
-//        cursor = getContentResolver().query(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, as, null, null, null);
-        Date date = new Date();
+        cursor = getContentResolver().query(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, as, null, null, null);
+//        longFrom = dateFrom.getTime();
+//        longTo = dateTo.getTime();
         /* FILTER ON BOTH DATES FROM DATE PICKER. SEE STACK OVERFLOW BOOKMARK FOR EXAMPLE */
-        cursor = getContentResolver().query(
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                null, android.provider.MediaStore.MediaColumns.DATE_ADDED + "<?",
-                new String[]{"" + date},
-                android.provider.MediaStore.MediaColumns.DATE_ADDED + " DESC");
+//        cursor = getContentResolver().query(
+//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                null, android.provider.MediaStore.Images.Media.DATE_TAKEN + ">? and "
+//                        + android.provider.MediaStore.Images.Media.DATE_TAKEN + "<?",
+//                new String[] { "" + dateFrom, "" + dateTo},
+//                android.provider.MediaStore.MediaColumns.DATE_ADDED + " DESC");
+//        cursor = getContentResolver().query(
+//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                null, android.provider.MediaStore.MediaColumns.DATE_ADDED + ">?",
+//                new String[]{"" + longFrom},
+//                android.provider.MediaStore.MediaColumns.DATE_ADDED + " DESC");
         imageColumnIndex = cursor.getColumnIndexOrThrow("_data");
         cursor.moveToPosition(0);
-        String s;
-        for (; cursor.moveToNext(); image_list.add(new ImageData(s)))
+
+        String path, timestamp;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+        Date curDate;
+        ExifInterface exif;
+
+        if(image_list.size() > 0) {
+            image_list.clear();
+        }
+        while(cursor.moveToNext())
         {
-            s = cursor.getString(imageColumnIndex);
+            path = cursor.getString(imageColumnIndex);
+            try {
+                exif = new ExifInterface(path);
+                timestamp = exif.getAttribute(ExifInterface.TAG_DATETIME);
+                if(timestamp != null) {
+                    curDate = sdf.parse(timestamp);
+                    if(curDate.after(dateFrom) && dateTo.after(curDate)) {
+                        image_list.add(new ImageData(path));
+                    }
+                }
+            } catch(IOException e) {
+
+            } catch(ParseException e) {
+
+            }
         }
 
         if(image_list.size() > 0) {
             selectedImage = (ImageData)image_list.get(0);
             System.out.println("GOT IMAGE " + selectedImage.imagePath);
         }
+        cursor.close();
     }
 
     private void startMapActivity() {
@@ -183,7 +231,6 @@ public class MainActivity extends Activity implements
     @Override
     protected void onResume() {
         super.onResume();
-
         // Logs 'install' and 'app activate' App Events.
 //        AppEventsLogger.activateApp(this);
     }
