@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/apenman/Downloads/PhotoMapProject/PhotoMap/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.0/libs/internal_impl-21.0.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="1609e6d42d0480b0f4188e2c29f75388fa12a8f0">
+        <dex dex="/Users/apenman/Downloads/PhotoMapProject/PhotoMap/build/intermediates/pre-dexed/debug/internal_impl-21.0.0-be239d5ad514fb33d2a0179d44e3471e984d27f0.jar" />
+    </item>
+    <item
+        jar="/Users/apenman/Downloads/PhotoMapProject/PhotoMap/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.0/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="686344a780033e4ba22b926cd225f8d4941247e6">
+        <dex dex="/Users/apenman/Downloads/PhotoMapProject/PhotoMap/build/intermediates/pre-dexed/debug/classes-82354c65a43d03b0841613304d19669ef3b2ae94.jar" />
+    </item>
+    <item
+        jar="/Users/apenman/.gradle/caches/modules-2/files-2.1/com.parse.bolts/bolts-android/1.1.2/91c20388c9a45f62b5ed8fe0502bb76ff6251fc7/bolts-android-1.1.2.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="91c20388c9a45f62b5ed8fe0502bb76ff6251fc7">
+        <dex dex="/Users/apenman/Downloads/PhotoMapProject/PhotoMap/build/intermediates/pre-dexed/debug/bolts-android-1.1.2-95fac832770c329e41966729fce7ab64fd6eb2bb.jar" />
+    </item>
+    <item
+        jar="/Users/apenman/Documents/android-sdk-macosx/extras/android/m2repository/com/android/support/support-annotations/21.0.0/support-annotations-21.0.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="1a578b9607b36266c63d43a4fa0ab5664dbe911e">
+        <dex dex="/Users/apenman/Downloads/PhotoMapProject/PhotoMap/build/intermediates/pre-dexed/debug/support-annotations-21.0.0-8e818659e1a552dca60eff93319833d35cae723e.jar" />
+    </item>
+    <item
+        jar="/Users/apenman/Downloads/PhotoMapProject/PhotoMap/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="dd9247ea0fabe8ee479638c4b4a23e93752be256">
+        <dex dex="/Users/apenman/Downloads/PhotoMapProject/PhotoMap/build/intermediates/pre-dexed/debug/classes-ee04562a409883a8b923ad1f82b7d03f101b918c.jar" />
+    </item>
+    <item
+        jar="/Users/apenman/Downloads/PhotoMapProject/PhotoMap/build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/3.21.1/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="0285ad8da812e92dda76ed5d0dcba05724c7911d">
+        <dex dex="/Users/apenman/Downloads/PhotoMapProject/PhotoMap/build/intermediates/pre-dexed/debug/classes-0dd8a3ab6c993dff2f49ada3e21afbb116206097.jar" />
+    </item>
+
+</items>
