@@ -242,6 +242,7 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void onPause() {
         super.onPause();
     }
+
     private void getSavedLists(ListView listView) {
         ImageMap[] currMapList;
 

@@ -12,11 +12,14 @@ import android.widget.Button;
 import android.net.Uri;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by apenman on 1/23/15.
@@ -136,11 +139,48 @@ public class DisplayActivity extends Activity {
     }
 
     private void saveListToPrefs(ImageMap map) {
-        ImageMap[] list = new ImageMap[1];
-        list[0] = map;
+        ImageMap[] currMapList;
+
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        String json2 = prefs.getString("test", null);
+
+        if (json2 != null) {
+            System.out.println("*%*%*%*%*%*%*");
+            System.out.println(json2);
+
+            Type listType = new TypeToken<List<ImageMap>>() {
+            }.getType();
+            List<ImageMap> list = new Gson().fromJson(json2, listType);
+            if (list.size() > 0) {
+                System.out.println("THERE IS STUFF");
+                System.out.println("SIZE IS: " + list.size());
+                currMapList = new ImageMap[list.size() + 1];
+                for (int i = 0; i < list.size(); i++) {
+//                    System.out.println("CHECKING " + i);
+                    ImageMap tempMap = list.get(i);
+                    if (tempMap != null) {
+//                        System.out.println("FOUND ONE AT " + Integer.toString(i));
+                        currMapList[i] = tempMap;
+                    } else {
+//                        System.out.println("HIT NULL AT " + Integer.toString(i));
+                    }
+                }
+                currMapList[currMapList.length - 1] = map;
+
+            } else {
+                currMapList = new ImageMap[1];
+                currMapList[0] = map;
+//                System.out.println("THERE IS NOTHING");
+            }
+        } else {
+//            System.out.println("NULL, SET TO 0");
+            currMapList = new ImageMap[1];
+            currMapList[0] = map;
+        }
 
         Gson gson = new Gson();
-        String json = gson.toJson(list);
+        String json = gson.toJson(currMapList);
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = pref.edit();
