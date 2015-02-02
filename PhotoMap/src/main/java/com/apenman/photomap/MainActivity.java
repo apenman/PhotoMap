@@ -1,22 +1,32 @@
 package com.apenman.photomap;
 
+import java.lang.reflect.Type;
 import java.util.Calendar;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TimePicker;
 import android.content.Intent;
 import java.util.Date;
 
 import android.database.Cursor;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity implements
         OnClickListener {
@@ -24,6 +34,7 @@ public class MainActivity extends Activity implements
     // Widget GUI
     Button btnCalendar, btnTimePicker, btnGetList;
     EditText txtDate, txtTime;
+    ListView listView;
 
     private static ArrayList image_list = new ArrayList();
     public static ImageData selectedImage;
@@ -37,7 +48,6 @@ public class MainActivity extends Activity implements
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        System.out.println("STARTING WOOO");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -47,6 +57,8 @@ public class MainActivity extends Activity implements
 
         txtDate = (EditText) findViewById(R.id.txtDate);
         txtTime = (EditText) findViewById(R.id.txtTime);
+
+        listView = (ListView) findViewById(R.id.listview);
 
         btnCalendar.setOnClickListener(this);
         btnTimePicker.setOnClickListener(this);
@@ -140,5 +152,59 @@ public class MainActivity extends Activity implements
         Intent intent = new Intent(getBaseContext(), DisplayActivity.class);
         intent.putExtra("IMAGE_LIST", image_list);
         startActivity(intent);
+    }
+
+    private void getSavedLists(ListView listView) {
+        ImageMap[] currMapList;
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        String json2 = prefs.getString("json", null);
+
+        if(json2 != null) {
+//            System.out.println("*%*%*%*%*%*%*");
+//            System.out.println(json2);
+
+            Type listType = new TypeToken<List<ImageMap>>() {}.getType();
+            List<ImageMap> list = new Gson().fromJson(json2, listType);
+
+            if (list.size() > 0) {
+//                System.out.println("THERE IS STUFF");
+//                System.out.println("SIZE IS: " + list.size());
+                currMapList = new ImageMap[list.size()];
+                for (int i = 0; i < list.size(); i++) {
+//                    System.out.println("CHECKING " + i);
+                    ImageMap map = list.get(i);
+                    if (map != null) {
+//                        System.out.println("FOUND ONE AT " + Integer.toString(i));
+                        currMapList[i] = map;
+                    }
+                    else {
+//                        System.out.println("HIT NULL AT " + Integer.toString(i));
+                    }
+                }
+
+            } else {
+                currMapList = new ImageMap[0];
+//                System.out.println("THERE IS NOTHING");
+            }
+        }
+        else {
+//            System.out.println("NULL, SET TO 0");
+            currMapList = new ImageMap[0];
+        }
+
+        ArrayAdapter<ImageMap> adapter = new ArrayAdapter<ImageMap>(this,
+                android.R.layout.simple_list_item_1, currMapList);
+        listView.setAdapter(adapter);
+    }
+
+    private void saveListToPrefs(ImageData[] list) {
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("json", json);
+        editor.commit();
     }
 }

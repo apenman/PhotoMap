@@ -6,14 +6,20 @@ import com.google.android.gms.maps.model.LatLng;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Random;
+import com.google.gson.annotations.SerializedName;
+
 
 /**
  * Created by apenman on 1/23/15.
  */
 
 public class ImageData implements Serializable {
+    @SerializedName("image_path")
     String imagePath;
-    Double lat, lng;
+    @SerializedName("lat")
+    Double lat;
+    @SerializedName("lng")
+    Double lng;
 
     public ImageData(String path) {
         imagePath = path;
