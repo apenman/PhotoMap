@@ -16,6 +16,12 @@
         android:text="Prev"
         android:id="@+id/prevButton" />
 
+    <Button
+        android:layout_width="73dp"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:id="@+id/saveButton" />
+
     <TextView android:textColor="#fff" android:textSize="20dp"
         android:layout_height="wrap_content" android:id="@+id/test"
         android:text="Hi There" android:layout_width="wrap_content"

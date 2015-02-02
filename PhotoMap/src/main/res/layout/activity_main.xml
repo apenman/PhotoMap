@@ -1,45 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-    <TextView android:textColor="#fff" android:textSize="20dp"
-        android:layout_height="wrap_content" android:id="@+id/textView1"
-        android:text="Pulse 7 Demo" android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal" android:paddingTop="10dp"
-        android:paddingBottom="10dp"></TextView>
-    <TextView android:textColor="#fff" android:textSize="20dp"
-        android:layout_height="wrap_content" android:id="@+id/textView2"
-        android:text="Date and Time Picker Dialog" android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal" android:paddingTop="5dp"
-        android:paddingBottom="25dp"></TextView>
-    <LinearLayout android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:id="@+id/linearLayout1">
-        <EditText android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:layout_weight="1"
-            android:id="@+id/txtDate">
-            <requestFocus></requestFocus>
-        </EditText>
-        <Button android:layout_height="wrap_content"
-            android:layout_weight="0" android:id="@+id/btnCalendar" android:text="Calendar"
-            android:layout_width="100dp"></Button>
-    </LinearLayout>
-    <LinearLayout android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:id="@+id/linearLayout1">
-        <EditText android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:layout_weight="1"
-            android:id="@+id/txtTime">
-            <requestFocus></requestFocus>
-        </EditText>
-        <Button android:layout_height="wrap_content"
-            android:layout_weight="0" android:id="@+id/btnTimePicker"
-            android:text="Time Picker" android:layout_width="100dp"></Button>
-    </LinearLayout>
+android:orientation="vertical" android:layout_width="fill_parent"
+android:layout_height="fill_parent">
+<TextView android:textColor="#fff" android:textSize="20dp"
+    android:layout_height="wrap_content" android:id="@+id/textView2"
+    android:text="Date and Time Picker" android:layout_width="wrap_content"
+    android:layout_gravity="center_horizontal" android:paddingTop="5dp"
+    android:paddingBottom="25dp"></TextView>
+<TextView android:textColor="#fff" android:textSize="20dp"
+    android:layout_height="wrap_content" android:id="@+id/textView2"
+    android:text="From:" android:layout_width="wrap_content"
+    android:layout_gravity="left" android:paddingTop="5dp"
+    android:paddingBottom="25dp"></TextView>
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:id="@+id/linearLayout1">
+    <EditText android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_weight="1"
+        android:id="@+id/txtDateFrom"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:clickable="false"
+        android:enabled="false">
+    </EditText>
     <Button android:layout_height="wrap_content"
-        android:layout_weight="0" android:id="@+id/btnGetList"
-        android:text="Get Images" android:layout_width="100dp"></Button>
+        android:layout_weight="0" android:id="@+id/btnCalendarFrom" android:text="Calendar"
+        android:layout_width="100dp"></Button>
+</LinearLayout>
+<!--<LinearLayout android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content" android:id="@+id/linearLayout1">-->
+<!--<EditText android:layout_width="wrap_content"-->
+<!--android:layout_height="wrap_content" android:layout_weight="1"-->
+<!--android:id="@+id/txtTime">-->
+<!--<requestFocus></requestFocus>-->
+<!--</EditText>-->
+<!--<Button android:layout_height="wrap_content"-->
+<!--android:layout_weight="0" android:id="@+id/btnTimePicker"-->
+<!--android:text="Time Picker" android:layout_width="100dp"></Button>-->
+<!--</LinearLayout>-->
+<!--<Button android:layout_height="wrap_content"-->
+<!--android:layout_weight="0" android:id="@+id/btnGetList"-->
+<!--android:text="Get Images" android:layout_width="100dp"></Button>-->
+<TextView android:textColor="#fff" android:textSize="20dp"
+    android:layout_height="wrap_content" android:id="@+id/textView2"
+    android:text="To:" android:layout_width="wrap_content"
+    android:layout_gravity="left" android:paddingTop="5dp"
+    android:paddingBottom="25dp"></TextView>
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:id="@+id/linearLayout1">
+    <EditText android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_weight="1"
+        android:id="@+id/txtDateTo"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:clickable="false"
+        android:enabled="false">
+    </EditText>
+    <Button android:layout_height="wrap_content"
+        android:layout_weight="0" android:id="@+id/btnCalendarTo" android:text="Calendar"
+        android:layout_width="100dp"></Button>
+</LinearLayout>
+<Button android:layout_height="wrap_content"
+    android:layout_weight="0" android:id="@+id/btnGetList"
+    android:text="Get Images" android:layout_width="100dp"></Button>
 
-    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/listview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listview"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
 </LinearLayout>

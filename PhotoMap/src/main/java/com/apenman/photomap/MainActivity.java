@@ -1,12 +1,15 @@
 package com.apenman.photomap;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.text.ParseException;
 import java.util.Calendar;
 
+import android.content.SharedPreferences;
+import android.media.ExifInterface;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
@@ -19,22 +22,22 @@ import android.widget.ListView;
 import android.widget.TimePicker;
 import android.content.Intent;
 import java.util.Date;
-
 import android.database.Cursor;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class MainActivity extends Activity implements
-        OnClickListener {
 
+public class MainActivity extends Activity implements OnClickListener {
     // Widget GUI
-    Button btnCalendar, btnTimePicker, btnGetList;
-    EditText txtDate, txtTime;
+    Button btnCalendarFrom, btnCalendarTo, btnTimePicker, btnGetList;
+    EditText txtDateFrom, txtDateTo, txtTime;
     ListView listView;
+
 
     private static ArrayList image_list = new ArrayList();
     public static ImageData selectedImage;
@@ -43,7 +46,12 @@ public class MainActivity extends Activity implements
     private int imageColumnIndex;
 
     // Variable for storing current date and time
-    private int mYear, mMonth, mDay, mHour, mMinute;
+    private int mYearFrom, mMonthFrom, mDayFrom, mHourFrom, mMinuteFrom;
+    private int mYearTo, mMonthTo, mDayTo, mHourTo, mMinuteTo;
+    private Date dateFrom = new Date();
+    private Date dateTo = new Date();
+//    private long longFrom = dateFrom.getTime();
+//    private long longTo = dateTo.getTime();
 
     /** Called when the activity is first created. */
     @Override
@@ -51,30 +59,40 @@ public class MainActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnCalendar = (Button) findViewById(R.id.btnCalendar);
-        btnTimePicker = (Button) findViewById(R.id.btnTimePicker);
+        btnCalendarFrom = (Button) findViewById(R.id.btnCalendarFrom);
+        btnCalendarTo = (Button) findViewById(R.id.btnCalendarTo);
+//        btnTimePicker = (Button) findViewById(R.id.btnTimePicker);
         btnGetList = (Button) findViewById(R.id.btnGetList);
 
-        txtDate = (EditText) findViewById(R.id.txtDate);
-        txtTime = (EditText) findViewById(R.id.txtTime);
-
+        txtDateFrom = (EditText) findViewById(R.id.txtDateFrom);
+        txtDateTo = (EditText) findViewById(R.id.txtDateTo);
         listView = (ListView) findViewById(R.id.listview);
 
-        btnCalendar.setOnClickListener(this);
-        btnTimePicker.setOnClickListener(this);
+        // Set the date fields to today
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
+        String formattedDate = df.format(c.getTime());
+        txtDateFrom.setText(formattedDate);
+        txtDateTo.setText(formattedDate);
+
+//        txtTime = (EditText) findViewById(R.id.txtTime);
+
+        btnCalendarFrom.setOnClickListener(this);
+        btnCalendarTo.setOnClickListener(this);
+//        btnTimePicker.setOnClickListener(this);
         btnGetList.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
 
-        if (v == btnCalendar) {
+        if (v == btnCalendarFrom) {
 
             // Process to get Current Date
             final Calendar c = Calendar.getInstance();
-            mYear = c.get(Calendar.YEAR);
-            mMonth = c.get(Calendar.MONTH);
-            mDay = c.get(Calendar.DAY_OF_MONTH);
+            mYearFrom = c.get(Calendar.YEAR);
+            mMonthFrom = c.get(Calendar.MONTH);
+            mDayFrom = c.get(Calendar.DAY_OF_MONTH);
 
             // Launch Date Picker Dialog
             DatePickerDialog dpd = new DatePickerDialog(this,
@@ -84,33 +102,49 @@ public class MainActivity extends Activity implements
                         public void onDateSet(DatePicker view, int year,
                                               int monthOfYear, int dayOfMonth) {
                             // Display Selected date in textbox
-                            txtDate.setText(dayOfMonth + "-"
-                                    + (monthOfYear + 1) + "-" + year);
+                            String dateStr = monthOfYear + 1 + "-"
+                                    + (dayOfMonth + 1) + "-" + year;
+                            txtDateFrom.setText(dateStr);
+                            SimpleDateFormat  format = new SimpleDateFormat("MM-dd-yyyy");
+                            try {
+                                dateFrom = format.parse(dateStr);
+                            } catch(ParseException e) {
+                                e.printStackTrace();
+                            }
 
                         }
-                    }, mYear, mMonth, mDay);
+                    }, mYearFrom, mMonthFrom, mDayFrom);
             dpd.show();
         }
 
-        if (v == btnTimePicker) {
+        if (v == btnCalendarTo) {
 
-            // Process to get Current Time
+            // Process to get Current Date
             final Calendar c = Calendar.getInstance();
-            mHour = c.get(Calendar.HOUR_OF_DAY);
-            mMinute = c.get(Calendar.MINUTE);
+            mYearTo = c.get(Calendar.YEAR);
+            mMonthTo = c.get(Calendar.MONTH);
+            mDayTo = c.get(Calendar.DAY_OF_MONTH);
 
-            // Launch Time Picker Dialog
-            TimePickerDialog tpd = new TimePickerDialog(this,
-                    new TimePickerDialog.OnTimeSetListener() {
+            // Launch Date Picker Dialog
+            DatePickerDialog dpd = new DatePickerDialog(this,
+                    new DatePickerDialog.OnDateSetListener() {
 
                         @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay,
-                                              int minute) {
-                            // Display Selected time in textbox
-                            txtTime.setText(hourOfDay + ":" + minute);
+                        public void onDateSet(DatePicker view, int year,
+                                              int monthOfYear, int dayOfMonth) {
+                            // Display Selected date in textbox
+                            String dateStr = monthOfYear + 1 + "-"
+                                    + (dayOfMonth + 1) + "-" + year;
+                            txtDateTo.setText(dateStr);
+                            SimpleDateFormat  format = new SimpleDateFormat("MM-dd-yyyy");
+                            try {
+                                dateTo = format.parse(dateStr);
+                            } catch(ParseException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }, mHour, mMinute, false);
-            tpd.show();
+                    }, mYearTo, mMonthTo, mDayTo);
+            dpd.show();
         }
 
         if (v == btnGetList) {
@@ -125,26 +159,56 @@ public class MainActivity extends Activity implements
         String as[] = {
                 "_data"
         };
-//        cursor = getContentResolver().query(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, as, null, null, null);
-        Date date = new Date();
-        /* FILTER ON BOTH DATES FROM DATE PICKER. SEE STACK OVERFLOW BOOKMARK FOR EXAMPLE */
-        cursor = getContentResolver().query(
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                null, android.provider.MediaStore.MediaColumns.DATE_ADDED + "<?",
-                new String[]{"" + date},
-                android.provider.MediaStore.MediaColumns.DATE_ADDED + " DESC");
+        cursor = getContentResolver().query(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, as, null, null, null);
+//        longFrom = dateFrom.getTime();
+//        longTo = dateTo.getTime();
+    /* FILTER ON BOTH DATES FROM DATE PICKER. SEE STACK OVERFLOW BOOKMARK FOR EXAMPLE */
+//        cursor = getContentResolver().query(
+//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                null, android.provider.MediaStore.Images.Media.DATE_TAKEN + ">? and "
+//                        + android.provider.MediaStore.Images.Media.DATE_TAKEN + "<?",
+//                new String[] { "" + dateFrom, "" + dateTo},
+//                android.provider.MediaStore.MediaColumns.DATE_ADDED + " DESC");
+//        cursor = getContentResolver().query(
+//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                null, android.provider.MediaStore.MediaColumns.DATE_ADDED + ">?",
+//                new String[]{"" + longFrom},
+//                android.provider.MediaStore.MediaColumns.DATE_ADDED + " DESC");
         imageColumnIndex = cursor.getColumnIndexOrThrow("_data");
         cursor.moveToPosition(0);
-        String s;
-        for (; cursor.moveToNext(); image_list.add(new ImageData(s)))
+
+        String path, timestamp;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+        Date curDate;
+        ExifInterface exif;
+
+        if(image_list.size() > 0) {
+            image_list.clear();
+        }
+        while(cursor.moveToNext())
         {
-            s = cursor.getString(imageColumnIndex);
+            path = cursor.getString(imageColumnIndex);
+            try {
+                exif = new ExifInterface(path);
+                timestamp = exif.getAttribute(ExifInterface.TAG_DATETIME);
+                if(timestamp != null) {
+                    curDate = sdf.parse(timestamp);
+                    if(curDate.after(dateFrom) && dateTo.after(curDate)) {
+                        image_list.add(new ImageData(path));
+                    }
+                }
+            } catch(IOException e) {
+
+            } catch(ParseException e) {
+
+            }
         }
 
         if(image_list.size() > 0) {
             selectedImage = (ImageData)image_list.get(0);
             System.out.println("GOT IMAGE " + selectedImage.imagePath);
         }
+        cursor.close();
     }
 
     private void startMapActivity() {
@@ -154,22 +218,38 @@ public class MainActivity extends Activity implements
         startActivity(intent);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Logs 'install' and 'app activate' App Events.
+//        AppEventsLogger.activateApp(this);
+        getSavedLists((ListView)findViewById(R.id.listview));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Logs 'app deactivate' App Event.
+//        AppEventsLogger.deactivateApp(this);
+    }
     private void getSavedLists(ListView listView) {
         ImageMap[] currMapList;
+
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
-        String json2 = prefs.getString("json", null);
+        String json2 = prefs.getString("test", null);
 
-        if(json2 != null) {
-//            System.out.println("*%*%*%*%*%*%*");
-//            System.out.println(json2);
+        if (json2 != null) {
+            System.out.println("*%*%*%*%*%*%*");
+            System.out.println(json2);
 
-            Type listType = new TypeToken<List<ImageMap>>() {}.getType();
+            Type listType = new TypeToken<List<ImageMap>>() {
+            }.getType();
             List<ImageMap> list = new Gson().fromJson(json2, listType);
-
             if (list.size() > 0) {
-//                System.out.println("THERE IS STUFF");
-//                System.out.println("SIZE IS: " + list.size());
+                System.out.println("THERE IS STUFF");
+                System.out.println("SIZE IS: " + list.size());
                 currMapList = new ImageMap[list.size()];
                 for (int i = 0; i < list.size(); i++) {
 //                    System.out.println("CHECKING " + i);
@@ -177,8 +257,7 @@ public class MainActivity extends Activity implements
                     if (map != null) {
 //                        System.out.println("FOUND ONE AT " + Integer.toString(i));
                         currMapList[i] = map;
-                    }
-                    else {
+                    } else {
 //                        System.out.println("HIT NULL AT " + Integer.toString(i));
                     }
                 }
@@ -187,8 +266,7 @@ public class MainActivity extends Activity implements
                 currMapList = new ImageMap[0];
 //                System.out.println("THERE IS NOTHING");
             }
-        }
-        else {
+        } else {
 //            System.out.println("NULL, SET TO 0");
             currMapList = new ImageMap[0];
         }
@@ -196,15 +274,5 @@ public class MainActivity extends Activity implements
         ArrayAdapter<ImageMap> adapter = new ArrayAdapter<ImageMap>(this,
                 android.R.layout.simple_list_item_1, currMapList);
         listView.setAdapter(adapter);
-    }
-
-    private void saveListToPrefs(ImageData[] list) {
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("json", json);
-        editor.commit();
     }
 }

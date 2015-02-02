@@ -2,23 +2,30 @@ package com.apenman.photomap;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.net.Uri;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Button;
+import android.net.Uri;
 
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
+/**
+ * Created by apenman on 1/23/15.
+ */
 public class DisplayActivity extends Activity {
+    TextView text;
     ImageData[] map_list;
     ImageMap map;
-    TextView text;
-    Button nextButton, prevButton;
+    Button nextButton, prevButton, saveButton;
     private static ArrayList image_list = new ArrayList();
     static ImageData selectedImage;
     static int selectedIndex = 0;
@@ -28,17 +35,16 @@ public class DisplayActivity extends Activity {
         setContentView(R.layout.activity_display);
 
         image_list = getIntent().getStringArrayListExtra("IMAGE_LIST");
-
-        text = (TextView) findViewById(R.id.test);
-        nextButton = (Button) findViewById(R.id.nextButton);
-        prevButton = (Button) findViewById(R.id.prevButton);
-
-        image_list = getIntent().getStringArrayListExtra("IMAGE_LIST");
         map_list = new ImageData[image_list.size()];
 
         for(int i = 0; i < image_list.size(); i++) {
             map_list[i] = (ImageData) image_list.get(i);
         }
+
+        text = (TextView) findViewById(R.id.test);
+        nextButton = (Button) findViewById(R.id.nextButton);
+        prevButton = (Button) findViewById(R.id.prevButton);
+        saveButton = (Button) findViewById(R.id.saveButton);
 
         if(nextButton == null) {
             System.out.println("UHOH");
@@ -57,6 +63,16 @@ public class DisplayActivity extends Activity {
             public void onClick(View v) {
                 prevImage();
                 setImage();
+            }
+        });
+
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("SAVING");
+                String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                map = new ImageMap(currentDateTimeString, map_list);
+                saveListToPrefs(map);
             }
         });
 
@@ -118,13 +134,17 @@ public class DisplayActivity extends Activity {
             System.out.println("WAS NULL");
         }
     }
-    private void saveListToPrefs(ImageData[] list) {
+
+    private void saveListToPrefs(ImageMap map) {
+        ImageMap[] list = new ImageMap[1];
+        list[0] = map;
+
         Gson gson = new Gson();
         String json = gson.toJson(list);
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString("json", json);
+        editor.putString("test", json);
         editor.commit();
     }
 }

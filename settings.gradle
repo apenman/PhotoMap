@@ -1,1 +1,1 @@
-include ':PhotoMap'
+include ':PhotoMap', ':facebook'
