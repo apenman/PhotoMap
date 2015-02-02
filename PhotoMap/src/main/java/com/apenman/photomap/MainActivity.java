@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -23,6 +25,7 @@ import android.widget.TimePicker;
 import android.content.Intent;
 import java.util.Date;
 import android.database.Cursor;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -81,6 +84,29 @@ public class MainActivity extends Activity implements OnClickListener {
         btnCalendarTo.setOnClickListener(this);
 //        btnTimePicker.setOnClickListener(this);
         btnGetList.setOnClickListener(this);
+
+        listView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapter, View view,
+                                    int position, long id) {
+                if(image_list.size() > 0) {
+                    image_list.clear();
+                }
+
+                /* THIS IS VERY INEFFICIENT, IMPLEMENT PARCEABLE IN IMAGEDATA/MAP */
+                ImageMap map = (ImageMap)adapter.getItemAtPosition(position);
+                ImageData[] mapList = map.getImageList();
+
+                for(int i = 0; i < mapList.length; i++) {
+                    image_list.add(i, mapList[i]);
+                }
+
+                System.out.println(map.toString());
+                Intent intent = new Intent(getBaseContext(), DisplayActivity.class);
+                intent.putExtra("IMAGE_LIST", image_list);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -160,20 +186,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 "_data"
         };
         cursor = getContentResolver().query(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, as, null, null, null);
-//        longFrom = dateFrom.getTime();
-//        longTo = dateTo.getTime();
-    /* FILTER ON BOTH DATES FROM DATE PICKER. SEE STACK OVERFLOW BOOKMARK FOR EXAMPLE */
-//        cursor = getContentResolver().query(
-//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-//                null, android.provider.MediaStore.Images.Media.DATE_TAKEN + ">? and "
-//                        + android.provider.MediaStore.Images.Media.DATE_TAKEN + "<?",
-//                new String[] { "" + dateFrom, "" + dateTo},
-//                android.provider.MediaStore.MediaColumns.DATE_ADDED + " DESC");
-//        cursor = getContentResolver().query(
-//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-//                null, android.provider.MediaStore.MediaColumns.DATE_ADDED + ">?",
-//                new String[]{"" + longFrom},
-//                android.provider.MediaStore.MediaColumns.DATE_ADDED + " DESC");
+
         imageColumnIndex = cursor.getColumnIndexOrThrow("_data");
         cursor.moveToPosition(0);
 
@@ -221,17 +234,13 @@ public class MainActivity extends Activity implements OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-        // Logs 'install' and 'app activate' App Events.
-//        AppEventsLogger.activateApp(this);
+
         getSavedLists((ListView)findViewById(R.id.listview));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        // Logs 'app deactivate' App Event.
-//        AppEventsLogger.deactivateApp(this);
     }
     private void getSavedLists(ListView listView) {
         ImageMap[] currMapList;
