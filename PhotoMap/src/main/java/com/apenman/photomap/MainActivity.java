@@ -255,8 +255,6 @@ public class MainActivity extends Activity implements OnClickListener {
             }.getType();
             List<ImageMap> list = new Gson().fromJson(json2, listType);
             if (list.size() > 0) {
-                System.out.println("THERE IS STUFF");
-                System.out.println("SIZE IS: " + list.size());
                 currMapList = new ImageMap[list.size()];
                 for (int i = 0; i < list.size(); i++) {
                     ImageMap map = list.get(i);

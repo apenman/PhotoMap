@@ -90,33 +90,35 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     }
 
     public void nextImage() {
-        if (-1 + image_list.size() == selectedIndex)
-        {
-            selectedIndex = 0;
-            selectedImage = (ImageData)image_list.get(selectedIndex);
-        } else
-        {
-            selectedIndex = 1 + selectedIndex;
-            selectedImage = (ImageData)image_list.get(selectedIndex);
+        if (image_list.size() != 0) {
+            if (-1 + image_list.size() == selectedIndex) {
+                selectedIndex = 0;
+                selectedImage = (ImageData) image_list.get(selectedIndex);
+            } else {
+                selectedIndex = 1 + selectedIndex;
+                selectedImage = (ImageData) image_list.get(selectedIndex);
+            }
+            updateText();
         }
-        updateText();
+    }
+
+    public void prevImage() {
+        if(image_list.size() != 0) {
+            if (selectedIndex == 0) {
+                selectedIndex = -1 + image_list.size();
+                selectedImage = (ImageData) image_list.get(selectedIndex);
+            } else {
+                selectedIndex = -1 + selectedIndex;
+                selectedImage = (ImageData) image_list.get(selectedIndex);
+            }
+            updateText();
+        }
     }
 
     public void updateText() {
         text.setText(selectedImage.imagePath);
     }
-    public void prevImage() {
-        if (selectedIndex == 0)
-        {
-            selectedIndex = -1 + image_list.size();
-            selectedImage = (ImageData)image_list.get(selectedIndex);
-        } else
-        {
-            selectedIndex = -1 + selectedIndex;
-            selectedImage = (ImageData)image_list.get(selectedIndex);
-        }
-        updateText();
-    }
+
 
     public void setImage() {
         if(selectedImage != null) {
