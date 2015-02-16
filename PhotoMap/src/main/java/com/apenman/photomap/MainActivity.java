@@ -91,18 +91,8 @@ public class MainActivity extends Activity implements OnClickListener {
 //                    image_list.clear();
 //                }
 
-                /* THIS IS VERY INEFFICIENT, IMPLEMENT PARCEABLE IN IMAGEDATA/MAP */
-//                ImageMap map = (ImageMap)adapter.getItemAtPosition(position);
-//                ImageData[] mapList = map.getImageList();
-//
-//                for(int i = 0; i < mapList.length; i++) {
-//                    image_list.add(i, mapList[i]);
-//                }
-//
-//                System.out.println(map.toString());
                 GlobalList.getGlobalInstance().setCurrMap((ImageMap) adapter.getItemAtPosition(position));
                 Intent intent = new Intent(getBaseContext(), DisplayActivity.class);
-//                intent.putExtra("IMAGE_LIST", image_list);
                 startActivity(intent);
 
             }
