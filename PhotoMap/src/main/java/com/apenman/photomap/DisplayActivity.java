@@ -198,6 +198,7 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     /* This is called when 'OK' is pressed on AlertDialog when saving map */
     @Override
     public void onFinishMapDialog(String mapName) {
+        /* Check empty string is not working currently */
         if(mapName != null && mapName != " ") {
             map = new ImageMap(mapName, map_list);
         }
