@@ -3,6 +3,7 @@ package com.apenman.photomap;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
@@ -27,7 +28,6 @@ import java.util.List;
 public class DisplayActivity extends FragmentActivity implements MapNameDialog.MapNameDialogListener {
     TextView text;
     ImageData[] map_list;
-    ImageMap map;
     Button nextButton, prevButton, saveButton;
     private static ArrayList image_list = new ArrayList();
     static ImageData selectedImage;
@@ -36,13 +36,6 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display);
-
-        image_list = getIntent().getStringArrayListExtra("IMAGE_LIST");
-        map_list = new ImageData[image_list.size()];
-
-        for(int i = 0; i < image_list.size(); i++) {
-            map_list[i] = (ImageData) image_list.get(i);
-        }
 
         text = (TextView) findViewById(R.id.test);
         nextButton = (Button) findViewById(R.id.nextButton);
@@ -77,58 +70,41 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
             }
         });
 
-        if(image_list.size() > 0) {
-            text.setText(((ImageData)image_list.get(0)).imagePath);
-            selectedImage = (ImageData)image_list.get(0);
-            selectedIndex = 0;
+        if(GlobalList.getGlobalInstance().getCurrMap().getImageList().length > 0) {
+            text.setText(GlobalList.getGlobalInstance().getCurrImage().imagePath);
         } else {
             text.setText("NONE");
-            selectedImage = null;
         }
 
         setImage();
     }
 
     public void nextImage() {
-        if (image_list.size() != 0) {
-            if (-1 + image_list.size() == selectedIndex) {
-                selectedIndex = 0;
-                selectedImage = (ImageData) image_list.get(selectedIndex);
-            } else {
-                selectedIndex = 1 + selectedIndex;
-                selectedImage = (ImageData) image_list.get(selectedIndex);
-            }
+        if(GlobalList.getGlobalInstance().setNextImage()) {
             updateText();
         }
     }
 
     public void prevImage() {
-        if(image_list.size() != 0) {
-            if (selectedIndex == 0) {
-                selectedIndex = -1 + image_list.size();
-                selectedImage = (ImageData) image_list.get(selectedIndex);
-            } else {
-                selectedIndex = -1 + selectedIndex;
-                selectedImage = (ImageData) image_list.get(selectedIndex);
-            }
+        if(GlobalList.getGlobalInstance().setPrevImage()) {
             updateText();
         }
     }
 
     public void updateText() {
-        text.setText(selectedImage.imagePath);
+        text.setText(GlobalList.getGlobalInstance().getCurrImage().imagePath);
     }
 
 
     public void setImage() {
-        if(selectedImage != null) {
+        if(GlobalList.getGlobalInstance().getCurrImage() != null) {
 //            File file = new File(selectedImage.imagePath);
 //            if (file.exists()) {
 //                android.graphics.Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
 //                ((ImageView) view.findViewById(R.id.imageView)).setImageBitmap(bitmap);
             ImageView imageView = ((ImageView) findViewById(R.id.imageView));
             if(imageView != null) {
-                imageView.setImageURI(Uri.parse(selectedImage.imagePath));
+                imageView.setImageURI(Uri.parse(GlobalList.getGlobalInstance().getCurrImage().imagePath));
             } else {
                 System.out.println("OOPS");
             }
@@ -138,7 +114,7 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         }
     }
 
-    private void saveListToPrefs(ImageMap map) {
+    private void saveMapToPrefs() {
         ImageMap[] currMapList;
 
         SharedPreferences prefs = PreferenceManager
@@ -163,15 +139,15 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
                     } else {
                     }
                 }
-                currMapList[currMapList.length - 1] = map;
+                currMapList[currMapList.length - 1] = GlobalList.getGlobalInstance().getCurrMap();
 
             } else {
                 currMapList = new ImageMap[1];
-                currMapList[0] = map;
+                currMapList[0] = GlobalList.getGlobalInstance().getCurrMap();
             }
         } else {
             currMapList = new ImageMap[1];
-            currMapList[0] = map;
+            currMapList[0] = GlobalList.getGlobalInstance().getCurrMap();
         }
 
         Gson gson = new Gson();
@@ -195,12 +171,13 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     public void onFinishMapDialog(String mapName, String mapDescription) {
         /* Check empty string is not working currently */
         if(mapName != null && mapName != " ") {
-            map = new ImageMap(mapName, map_list, mapDescription);
+            GlobalList.getGlobalInstance().getCurrMap().setName(mapName);
+            GlobalList.getGlobalInstance().getCurrMap().setDescription(mapDescription);
         }
         else {
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-            map = new ImageMap(currentDateTimeString, map_list, mapDescription);
+            GlobalList.getGlobalInstance().getCurrMap().setName(currentDateTimeString);
         }
-        saveListToPrefs(map);
+        saveMapToPrefs();
     }
 }

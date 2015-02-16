@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -38,8 +39,7 @@ public class MainActivity extends Activity implements OnClickListener {
     EditText txtDateFrom, txtDateTo, txtTime;
     ListView listView;
 
-
-    private static ArrayList image_list = new ArrayList();
+    private static ImageData[] image_list;
     public static ImageData selectedImage;
     public static int selectedIndex = 0;
     private Cursor cursor;
@@ -86,22 +86,25 @@ public class MainActivity extends Activity implements OnClickListener {
             @Override
             public void onItemClick(AdapterView<?> adapter, View view,
                                     int position, long id) {
-                if(image_list.size() > 0) {
-                    image_list.clear();
-                }
+                /* used to clear the old image list here */
+//                if(image_list.length > 0) {
+//                    image_list.clear();
+//                }
 
                 /* THIS IS VERY INEFFICIENT, IMPLEMENT PARCEABLE IN IMAGEDATA/MAP */
-                ImageMap map = (ImageMap)adapter.getItemAtPosition(position);
-                ImageData[] mapList = map.getImageList();
-
-                for(int i = 0; i < mapList.length; i++) {
-                    image_list.add(i, mapList[i]);
-                }
-
-                System.out.println(map.toString());
+//                ImageMap map = (ImageMap)adapter.getItemAtPosition(position);
+//                ImageData[] mapList = map.getImageList();
+//
+//                for(int i = 0; i < mapList.length; i++) {
+//                    image_list.add(i, mapList[i]);
+//                }
+//
+//                System.out.println(map.toString());
+                GlobalList.getGlobalInstance().setCurrMap((ImageMap) adapter.getItemAtPosition(position));
                 Intent intent = new Intent(getBaseContext(), DisplayActivity.class);
-                intent.putExtra("IMAGE_LIST", image_list);
+//                intent.putExtra("IMAGE_LIST", image_list);
                 startActivity(intent);
+
             }
         });
     }
@@ -192,9 +195,18 @@ public class MainActivity extends Activity implements OnClickListener {
         Date curDate;
         ExifInterface exif;
 
-        if(image_list.size() > 0) {
-            image_list.clear();
-        }
+        /* clear image list here */
+//        if(image_list.size() > 0) {
+//            image_list.clear();
+//        }
+        int index = 0;
+        /* can't do this until we can query with right dates.
+            the current cursor count is all images
+         */
+//        image_list = new ImageData[cursor.getCount()];
+
+        ArrayList templist = new ArrayList();
+
         while(cursor.moveToNext())
         {
             path = cursor.getString(imageColumnIndex);
@@ -204,7 +216,8 @@ public class MainActivity extends Activity implements OnClickListener {
                 if(timestamp != null) {
                     curDate = sdf.parse(timestamp);
                     if(curDate.after(dateFrom) && dateTo.after(curDate)) {
-                        image_list.add(new ImageData(path));
+//                        image_list[index] = new ImageData(path);
+                        templist.add(new ImageData(path));
                     }
                 }
             } catch(IOException e) {
@@ -212,19 +225,32 @@ public class MainActivity extends Activity implements OnClickListener {
             } catch(ParseException e) {
 
             }
+            index++;
         }
 
-        if(image_list.size() > 0) {
-            selectedImage = (ImageData)image_list.get(0);
-            System.out.println("GOT IMAGE " + selectedImage.imagePath);
+        // Current image list work around
+        image_list = new ImageData[templist.size()];
+        for(int i = 0; i < templist.size(); i++) {
+            image_list[i] = (ImageData) templist.get(i);
         }
+
+        if(image_list.length > 0) {
+            System.out.println("LONGER THAN 0");
+            System.out.println(image_list.length);
+            GlobalList.getGlobalInstance().setCurrImage(image_list[0]);
+        }
+
+        /* set the current map to the new map */
+        ImageMap map = new ImageMap("", image_list, "");
+        GlobalList.getGlobalInstance().setCurrMap(map);
+
         cursor.close();
     }
 
     private void startMapActivity() {
         getImageList();
         Intent intent = new Intent(getBaseContext(), DisplayActivity.class);
-        intent.putExtra("IMAGE_LIST", image_list);
+//        intent.putExtra("IMAGE_LIST", image_list);
         startActivity(intent);
     }
 
