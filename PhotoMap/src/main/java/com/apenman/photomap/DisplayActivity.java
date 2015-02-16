@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,7 +26,7 @@ import java.util.List;
 /**
  * Created by apenman on 1/23/15.
  */
-public class DisplayActivity extends Activity {
+public class DisplayActivity extends FragmentActivity implements MapNameDialog.MapNameDialogListener {
     TextView text;
     ImageData[] map_list;
     ImageMap map;
@@ -73,9 +75,7 @@ public class DisplayActivity extends Activity {
             @Override
             public void onClick(View v) {
                 System.out.println("SAVING");
-                String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-                map = new ImageMap(currentDateTimeString, map_list);
-                saveListToPrefs(map);
+                showEditDialog();
             }
         });
 
@@ -186,5 +186,25 @@ public class DisplayActivity extends Activity {
         SharedPreferences.Editor editor = pref.edit();
         editor.putString("test", json);
         editor.commit();
+    }
+
+    /* display the edit map name dialog */
+    private void showEditDialog(){
+        FragmentManager fm = getSupportFragmentManager();
+        MapNameDialog mapNameDialog = MapNameDialog.newInstance("Set Map Name");
+        mapNameDialog.show(fm, "fragment_map_name");
+    }
+
+    /* This is called when 'OK' is pressed on AlertDialog when saving map */
+    @Override
+    public void onFinishMapDialog(String mapName) {
+        if(mapName != null && mapName != " ") {
+            map = new ImageMap(mapName, map_list);
+        }
+        else {
+            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+            map = new ImageMap(currentDateTimeString, map_list);
+        }
+        saveListToPrefs(map);
     }
 }
