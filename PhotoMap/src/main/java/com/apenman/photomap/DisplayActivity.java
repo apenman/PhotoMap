@@ -1,8 +1,6 @@
 package com.apenman.photomap;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
@@ -157,13 +155,10 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
                 System.out.println("SIZE IS: " + list.size());
                 currMapList = new ImageMap[list.size() + 1];
                 for (int i = 0; i < list.size(); i++) {
-//                    System.out.println("CHECKING " + i);
                     ImageMap tempMap = list.get(i);
                     if (tempMap != null) {
-//                        System.out.println("FOUND ONE AT " + Integer.toString(i));
                         currMapList[i] = tempMap;
                     } else {
-//                        System.out.println("HIT NULL AT " + Integer.toString(i));
                     }
                 }
                 currMapList[currMapList.length - 1] = map;
@@ -171,10 +166,8 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
             } else {
                 currMapList = new ImageMap[1];
                 currMapList[0] = map;
-//                System.out.println("THERE IS NOTHING");
             }
         } else {
-//            System.out.println("NULL, SET TO 0");
             currMapList = new ImageMap[1];
             currMapList[0] = map;
         }
@@ -197,14 +190,14 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
 
     /* This is called when 'OK' is pressed on AlertDialog when saving map */
     @Override
-    public void onFinishMapDialog(String mapName) {
+    public void onFinishMapDialog(String mapName, String mapDescription) {
         /* Check empty string is not working currently */
         if(mapName != null && mapName != " ") {
-            map = new ImageMap(mapName, map_list);
+            map = new ImageMap(mapName, map_list, mapDescription);
         }
         else {
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-            map = new ImageMap(currentDateTimeString, map_list);
+            map = new ImageMap(currentDateTimeString, map_list, mapDescription);
         }
         saveListToPrefs(map);
     }

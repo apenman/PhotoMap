@@ -9,19 +9,16 @@ import android.content.SharedPreferences;
 import android.media.ExifInterface;
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TimePicker;
 import android.content.Intent;
 import java.util.Date;
 import android.database.Cursor;
@@ -262,22 +259,17 @@ public class MainActivity extends Activity implements OnClickListener {
                 System.out.println("SIZE IS: " + list.size());
                 currMapList = new ImageMap[list.size()];
                 for (int i = 0; i < list.size(); i++) {
-//                    System.out.println("CHECKING " + i);
                     ImageMap map = list.get(i);
                     if (map != null) {
-//                        System.out.println("FOUND ONE AT " + Integer.toString(i));
                         currMapList[i] = map;
                     } else {
-//                        System.out.println("HIT NULL AT " + Integer.toString(i));
                     }
                 }
 
             } else {
                 currMapList = new ImageMap[0];
-//                System.out.println("THERE IS NOTHING");
             }
         } else {
-//            System.out.println("NULL, SET TO 0");
             currMapList = new ImageMap[0];
         }
 

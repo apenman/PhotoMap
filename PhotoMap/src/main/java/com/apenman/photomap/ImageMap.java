@@ -11,10 +11,13 @@ public class ImageMap {
     String name;
     @SerializedName("image_list")
     ImageData[] imageList;
+    @SerializedName("description")
+    String description;
 
-    public ImageMap(String name, ImageData[] imageList) {
+    public ImageMap(String name, ImageData[] imageList, String description) {
         this.name = name;
         this.imageList = imageList;
+        this.description = description;
     }
 
     public String getName() {
@@ -25,8 +28,10 @@ public class ImageMap {
         return imageList;
     }
 
+    public String getDescription() { return description; }
+
     @Override
     public String toString() {
-        return name;
+        return name + "\n" + description;
     }
 }
