@@ -1,14 +1,18 @@
 package com.apenman.photomap;
 
+import java.util.List;
+
 /**
  * Created by apenman on 2/15/15.
  */
 public class GlobalList {
     private static GlobalList globalInstance;
-    private static ImageMap[] currMapList;
+    private static List<ImageMap> currMapList;
     private static ImageMap currMap;
     private static ImageData currImage;
     private static int currImageIndex;
+
+
 
     private GlobalList(){}
 
@@ -20,7 +24,7 @@ public class GlobalList {
         return globalInstance;
     }
 
-    public static void setCurrMapList(ImageMap[] mapList) {
+    public static void setCurrMapList(List<ImageMap> mapList) {
         currMapList = mapList;
     }
 
@@ -37,14 +41,14 @@ public class GlobalList {
     }
 
     public static boolean setNextImage() {
-        int size = currMap.getImageList().length;
+        int size = currMap.getImageList().size();
         if (size != 0) {
             if (-1 + size == currImageIndex) {
                 currImageIndex = 0;
             } else {
                 currImageIndex += 1;
             }
-            currImage = currMap.getImageList()[currImageIndex];
+            currImage = currMap.getImageList().get(currImageIndex);
             return true;
         }
 
@@ -52,21 +56,21 @@ public class GlobalList {
     }
 
     public static boolean setPrevImage() {
-        int size = currMap.getImageList().length;
+        int size = currMap.getImageList().size();
         if (size != 0) {
             if (currImageIndex == 0) {
                 currImageIndex = size - 1;
             } else {
                 currImageIndex -= 1;
             }
-            currImage = currMap.getImageList()[currImageIndex];
+            currImage = currMap.getImageList().get(currImageIndex);
             return true;
         }
 
         return false;
     }
 
-    public static ImageMap[] getCurrMapList() {
+    public static List<ImageMap> getCurrMapList() {
         return currMapList;
     }
 

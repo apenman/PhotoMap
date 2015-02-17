@@ -39,7 +39,7 @@ public class MainActivity extends Activity implements OnClickListener {
     EditText txtDateFrom, txtDateTo, txtTime;
     ListView listView;
 
-    private static ImageData[] image_list;
+    private static List<ImageData> image_list = new ArrayList<ImageData>();
     public static ImageData selectedImage;
     public static int selectedIndex = 0;
     private Cursor cursor;
@@ -219,15 +219,14 @@ public class MainActivity extends Activity implements OnClickListener {
         }
 
         // Current image list work around
-        image_list = new ImageData[templist.size()];
         for(int i = 0; i < templist.size(); i++) {
-            image_list[i] = (ImageData) templist.get(i);
+            image_list.add((ImageData) templist.get(i));
         }
 
-        if(image_list.length > 0) {
+        if(image_list.size() > 0) {
             System.out.println("LONGER THAN 0");
-            System.out.println(image_list.length);
-            GlobalList.getGlobalInstance().setCurrImage(image_list[0]);
+            System.out.println(image_list.size());
+            GlobalList.getGlobalInstance().setCurrImage(image_list.get(0));
         }
 
         /* set the current map to the new map */
@@ -248,7 +247,7 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void onResume() {
         super.onResume();
 
-        getSavedLists((ListView)findViewById(R.id.listview));
+        getSavedLists((ListView) findViewById(R.id.listview));
     }
 
     @Override

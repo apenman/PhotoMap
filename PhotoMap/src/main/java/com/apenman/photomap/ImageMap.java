@@ -2,6 +2,9 @@ package com.apenman.photomap;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by apenman on 2/1/15.
@@ -10,11 +13,11 @@ public class ImageMap {
     @SerializedName("name")
     String name;
     @SerializedName("image_list")
-    ImageData[] imageList;
+    List<ImageData> imageList = new ArrayList<ImageData>();
     @SerializedName("description")
     String description;
 
-    public ImageMap(String name, ImageData[] imageList, String description) {
+    public ImageMap(String name, List<ImageData> imageList, String description) {
         this.name = name;
         this.imageList = imageList;
         this.description = description;
@@ -32,7 +35,7 @@ public class ImageMap {
         return name;
     }
 
-    public ImageData[] getImageList() {
+    public List<ImageData> getImageList() {
         return imageList;
     }
 

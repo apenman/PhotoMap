@@ -27,11 +27,8 @@ import java.util.List;
  */
 public class DisplayActivity extends FragmentActivity implements MapNameDialog.MapNameDialogListener {
     TextView text;
-    ImageData[] map_list;
     Button nextButton, prevButton, saveButton;
-    private static ArrayList image_list = new ArrayList();
-    static ImageData selectedImage;
-    static int selectedIndex = 0;
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +67,7 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
             }
         });
 
-        if(GlobalList.getGlobalInstance().getCurrMap().getImageList().length > 0) {
+        if(GlobalList.getGlobalInstance().getCurrMap().getImageList().size() > 0) {
             text.setText(GlobalList.getGlobalInstance().getCurrImage().imagePath);
         } else {
             text.setText("NONE");
@@ -98,24 +95,18 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
 
     public void setImage() {
         if(GlobalList.getGlobalInstance().getCurrImage() != null) {
-//            File file = new File(selectedImage.imagePath);
-//            if (file.exists()) {
-//                android.graphics.Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-//                ((ImageView) view.findViewById(R.id.imageView)).setImageBitmap(bitmap);
+
             ImageView imageView = ((ImageView) findViewById(R.id.imageView));
-            if(imageView != null) {
+            if (imageView != null) {
                 imageView.setImageURI(Uri.parse(GlobalList.getGlobalInstance().getCurrImage().imagePath));
-            } else {
-                System.out.println("OOPS");
             }
-//            }
-        } else {
-            System.out.println("WAS NULL");
         }
     }
 
+
+    /******** EXAMINE THIS ******/
     private void saveMapToPrefs() {
-        ImageMap[] currMapList;
+        List<ImageMap> currMapList = new ArrayList<ImageMap>();
 
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
@@ -131,23 +122,20 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
             if (list.size() > 0) {
                 System.out.println("THERE IS STUFF");
                 System.out.println("SIZE IS: " + list.size());
-                currMapList = new ImageMap[list.size() + 1];
                 for (int i = 0; i < list.size(); i++) {
                     ImageMap tempMap = list.get(i);
                     if (tempMap != null) {
-                        currMapList[i] = tempMap;
+                        currMapList.add(tempMap);
                     } else {
                     }
                 }
-                currMapList[currMapList.length - 1] = GlobalList.getGlobalInstance().getCurrMap();
+                currMapList.add(GlobalList.getGlobalInstance().getCurrMap());
 
             } else {
-                currMapList = new ImageMap[1];
-                currMapList[0] = GlobalList.getGlobalInstance().getCurrMap();
+                currMapList.add(GlobalList.getGlobalInstance().getCurrMap());
             }
         } else {
-            currMapList = new ImageMap[1];
-            currMapList[0] = GlobalList.getGlobalInstance().getCurrMap();
+            currMapList.add(GlobalList.getGlobalInstance().getCurrMap());
         }
 
         Gson gson = new Gson();
