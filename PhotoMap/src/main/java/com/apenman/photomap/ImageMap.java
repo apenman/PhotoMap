@@ -12,13 +12,13 @@ import java.util.UUID;
  */
 public class ImageMap {
     @SerializedName("name")
-    String name;
+    private String name;
     @SerializedName("_id")
     final String _id;
     @SerializedName("image_list")
-    List<ImageData> imageList = new ArrayList<ImageData>();
+    private List<ImageData> imageList = new ArrayList<ImageData>();
     @SerializedName("description")
-    String description;
+    private String description;
 
     public ImageMap(String name, List<ImageData> imageList, String description) {
         this.name = name;

@@ -17,11 +17,11 @@ import com.google.gson.annotations.SerializedName;
 
 public class ImageData implements Serializable {
     @SerializedName("image_path")
-    String imagePath;
+    private String imagePath;
     @SerializedName("lat")
-    Double lat;
+    private Double lat;
     @SerializedName("lng")
-    Double lng;
+    private Double lng;
 
     public ImageData(String path) {
         imagePath = path;
@@ -56,5 +56,17 @@ public class ImageData implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public Double getLat() {
+        return lat;
+    }
+
+    public Double getLng() {
+        return lng;
     }
 }

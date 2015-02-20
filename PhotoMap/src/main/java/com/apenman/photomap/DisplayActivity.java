@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
@@ -15,12 +14,8 @@ import android.widget.Button;
 import android.net.Uri;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.lang.reflect.Type;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -80,7 +75,7 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         });
 
         if(GlobalList.getGlobalInstance().getCurrMap().getImageList().size() > 0) {
-            text.setText(GlobalList.getGlobalInstance().getCurrImage().imagePath);
+            text.setText(GlobalList.getGlobalInstance().getCurrImage().getImagePath());
         } else {
             text.setText("NONE");
         }
@@ -101,7 +96,7 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     }
 
     public void updateText() {
-        text.setText(GlobalList.getGlobalInstance().getCurrImage().imagePath);
+        text.setText(GlobalList.getGlobalInstance().getCurrImage().getImagePath());
     }
 
 
@@ -110,7 +105,7 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
 
             ImageView imageView = ((ImageView) findViewById(R.id.imageView));
             if (imageView != null) {
-                imageView.setImageURI(Uri.parse(GlobalList.getGlobalInstance().getCurrImage().imagePath));
+                imageView.setImageURI(Uri.parse(GlobalList.getGlobalInstance().getCurrImage().getImagePath()));
             }
         }
     }
