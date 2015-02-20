@@ -160,12 +160,19 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         /* Check empty string is not working currently */
         if(mapName != null && mapName != " ") {
             GlobalList.getGlobalInstance().getCurrMap().setName(mapName);
-            GlobalList.getGlobalInstance().getCurrMap().setDescription(mapDescription);
         }
         else {
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             GlobalList.getGlobalInstance().getCurrMap().setName(currentDateTimeString);
         }
+
+        if(mapDescription != null && mapDescription != " ") {
+            GlobalList.getGlobalInstance().getCurrMap().setDescription(mapDescription);
+        }
+        else {
+            GlobalList.getGlobalInstance().getCurrMap().setDescription(" ");
+        }
+
         saveMapToPrefs();
     }
 }
