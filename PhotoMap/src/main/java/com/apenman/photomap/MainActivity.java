@@ -87,14 +87,17 @@ public class MainActivity extends Activity implements OnClickListener {
             public void onItemClick(AdapterView<?> adapter, View view,
                                     int position, long id) {
                 /* used to clear the old image list here */
-//                if(image_list.length > 0) {
-//                    image_list.clear();
-//                }
+                //                if(image_list.length > 0) {
+                //                    image_list.clear();
+                //                }
 
-                GlobalList.getGlobalInstance().setCurrMap((ImageMap) adapter.getItemAtPosition(position));
+                ImageMap clickedMap = (ImageMap) adapter.getItemAtPosition(position);
+                System.out.println("THE MAP CLICKED: " + clickedMap);
+                System.out.println("THE MAP CLICKED: " + clickedMap.getImageList());
+                /* Set the current map. Current image and index will be set in displayactivity */
+                GlobalList.getGlobalInstance().setCurrMap(clickedMap);
                 Intent intent = new Intent(getBaseContext(), DisplayActivity.class);
                 startActivity(intent);
-
             }
         });
     }
@@ -223,12 +226,6 @@ public class MainActivity extends Activity implements OnClickListener {
             image_list.add((ImageData) templist.get(i));
         }
 
-        if(image_list.size() > 0) {
-            System.out.println("LONGER THAN 0");
-            System.out.println(image_list.size());
-            GlobalList.getGlobalInstance().setCurrImage(image_list.get(0));
-        }
-
         /* set the current map to the new map */
         ImageMap map = new ImageMap("", image_list, "");
         GlobalList.getGlobalInstance().setCurrMap(map);
@@ -256,7 +253,7 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     private void getSavedLists(ListView listView) {
-        ImageMap[] currMapList;
+        List<ImageMap> currMapList = new ArrayList<ImageMap>();
 
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
@@ -270,24 +267,24 @@ public class MainActivity extends Activity implements OnClickListener {
             }.getType();
             List<ImageMap> list = new Gson().fromJson(json2, listType);
             if (list.size() > 0) {
-                currMapList = new ImageMap[list.size()];
                 for (int i = 0; i < list.size(); i++) {
                     ImageMap map = list.get(i);
                     if (map != null) {
-                        currMapList[i] = map;
+                        currMapList.add(map);
                     } else {
                     }
                 }
 
-            } else {
-                currMapList = new ImageMap[0];
             }
-        } else {
-            currMapList = new ImageMap[0];
         }
 
+        /* Set the global saved map list */
+        GlobalList.getGlobalInstance().setCurrMapList(currMapList);
+
+        /* Set the maplist into the array adapter */
         ArrayAdapter<ImageMap> adapter = new ArrayAdapter<ImageMap>(this,
                 android.R.layout.simple_list_item_1, currMapList);
         listView.setAdapter(adapter);
+
     }
 }

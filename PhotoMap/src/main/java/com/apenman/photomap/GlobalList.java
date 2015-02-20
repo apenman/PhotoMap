@@ -70,6 +70,18 @@ public class GlobalList {
         return false;
     }
 
+    public static void removeImage() {
+        if(currImage != null) {
+            currMap.getImageList().remove(currImage);
+
+            /* Adjust current Index if the last image in list was removed */
+            if(currImageIndex >= currMap.getImageList().size()) {
+                currImageIndex = currMap.getImageList().size() -1;
+            }
+            currImage = currMap.getImageList().get(currImageIndex);
+        }
+    }
+
     public static List<ImageMap> getCurrMapList() {
         return currMapList;
     }

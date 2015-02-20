@@ -1,5 +1,7 @@
 package com.apenman.photomap;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -27,17 +29,19 @@ import java.util.List;
  */
 public class DisplayActivity extends FragmentActivity implements MapNameDialog.MapNameDialogListener {
     TextView text;
-    Button nextButton, prevButton, saveButton;
+    Button nextButton, prevButton, saveButton, removeButton;
 
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display);
+        setGlobalImages();
 
         text = (TextView) findViewById(R.id.test);
         nextButton = (Button) findViewById(R.id.nextButton);
         prevButton = (Button) findViewById(R.id.prevButton);
         saveButton = (Button) findViewById(R.id.saveButton);
+        removeButton = (Button) findViewById(R.id.removeButton);
 
         if(nextButton == null) {
             System.out.println("UHOH");
@@ -64,6 +68,14 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
             public void onClick(View v) {
                 System.out.println("SAVING");
                 showEditDialog();
+            }
+        });
+
+        removeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("REMOVING");
+                showRemoveDialog();
             }
         });
 
@@ -104,39 +116,10 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     }
 
 
-    /******** EXAMINE THIS ******/
+    /* Add the current Map to the end of Global List. Then write to shared prefs */
     private void saveMapToPrefs() {
-        List<ImageMap> currMapList = new ArrayList<ImageMap>();
-
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
-        String json2 = prefs.getString("test", null);
-
-        if (json2 != null) {
-            System.out.println("*%*%*%*%*%*%*");
-            System.out.println(json2);
-
-            Type listType = new TypeToken<List<ImageMap>>() {
-            }.getType();
-            List<ImageMap> list = new Gson().fromJson(json2, listType);
-            if (list.size() > 0) {
-                System.out.println("THERE IS STUFF");
-                System.out.println("SIZE IS: " + list.size());
-                for (int i = 0; i < list.size(); i++) {
-                    ImageMap tempMap = list.get(i);
-                    if (tempMap != null) {
-                        currMapList.add(tempMap);
-                    } else {
-                    }
-                }
-                currMapList.add(GlobalList.getGlobalInstance().getCurrMap());
-
-            } else {
-                currMapList.add(GlobalList.getGlobalInstance().getCurrMap());
-            }
-        } else {
-            currMapList.add(GlobalList.getGlobalInstance().getCurrMap());
-        }
+        List<ImageMap> currMapList = GlobalList.getGlobalInstance().getCurrMapList();
+        currMapList.add(GlobalList.getGlobalInstance().getCurrMap());
 
         Gson gson = new Gson();
         String json = gson.toJson(currMapList);
@@ -152,6 +135,39 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         FragmentManager fm = getSupportFragmentManager();
         MapNameDialog mapNameDialog = MapNameDialog.newInstance("Set Map Name");
         mapNameDialog.show(fm, "fragment_map_name");
+    }
+
+    private void showRemoveDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        // set title
+        alertDialogBuilder.setTitle("Remove Image");
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage("Are You Sure You Want To Remove Image?")
+                .setCancelable(false)
+                .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        GlobalList.getGlobalInstance().removeImage();
+                        updateText();
+                        setImage();
+                        dialog.cancel();
+                    }
+                })
+                .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, just close
+                        // the dialog box and do nothing
+                        dialog.cancel();
+                    }
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
     }
 
     /* This is called when 'OK' is pressed on AlertDialog when saving map */
@@ -174,5 +190,13 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         }
 
         saveMapToPrefs();
+    }
+
+    private void setGlobalImages() {
+        ImageMap currMap = GlobalList.getGlobalInstance().getCurrMap();
+        if(!currMap.isEmpty()) {
+            GlobalList.getGlobalInstance().setCurrImage(currMap.getImageList().get(0));
+            GlobalList.getGlobalInstance().setCurrImageIndex(0);
+        }
     }
 }
