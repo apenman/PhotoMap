@@ -14,9 +14,13 @@ import android.widget.Button;
 import android.net.Uri;
 import com.google.android.gms.maps.*;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -207,7 +211,7 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
             if(null == map){
                map = ((MapFragment) getFragmentManager().findFragmentById(
                         R.id.mapView)).getMap();
-
+               GlobalList.getGlobalInstance().setMap(map);
                 /**
                  * If the map is still null after attempted initialisation,
                  * show an error to the user
@@ -217,6 +221,21 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
                 }
             }
         } catch (NullPointerException exception){
+        }
+
+        /* Create marker list */
+        List<Marker> markerList = new ArrayList<Marker>();
+        List<ImageData> list = GlobalList.getGlobalInstance().getCurrMap().getImageList();
+
+        for (ImageData img : list) {
+            Marker newMark = GlobalList.getGlobalInstance().getMap().addMarker(new MarkerOptions().position(new LatLng(img.getLat(), img.getLng())));
+            markerList.add(newMark);
+        }
+
+        GlobalList.getGlobalInstance().setMarkerList(markerList);
+        System.out.println("MARKER LIST SIZE IS: " + markerList.size());
+        if(list.size() > 0) {
+            GlobalList.getGlobalInstance().getMap().animateCamera(CameraUpdateFactory.newLatLng(markerList.get(0).getPosition()));
         }
     }
 }
