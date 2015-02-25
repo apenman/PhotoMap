@@ -3,16 +3,18 @@ package com.apenman.photomap;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Button;
-import android.net.Uri;
-import com.google.android.gms.maps.*;
 
 import com.google.gson.Gson;
 
@@ -21,25 +23,21 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by apenman on 1/23/15.
+ * Created by apenman on 2/24/15.
  */
-public class DisplayActivity extends FragmentActivity implements MapNameDialog.MapNameDialogListener {
+public class ImageFragment extends Fragment implements MapNameDialog.MapNameDialogListener {
     TextView text;
     Button nextButton, prevButton, saveButton, removeButton;
-    GoogleMap map;
+    View myFragmentView;
 
-
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display);
-        setGlobalImages();
-        createMapView();
-
-        text = (TextView) findViewById(R.id.test);
-        nextButton = (Button) findViewById(R.id.nextButton);
-        prevButton = (Button) findViewById(R.id.prevButton);
-        saveButton = (Button) findViewById(R.id.saveButton);
-        removeButton = (Button) findViewById(R.id.removeButton);
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+        myFragmentView = inflater.inflate(R.layout.fragment_display, container, false);
+        text = (TextView) myFragmentView.findViewById(R.id.test);
+        nextButton = (Button) myFragmentView.findViewById(R.id.nextButton);
+        prevButton = (Button) myFragmentView.findViewById(R.id.prevButton);
+        saveButton = (Button) myFragmentView.findViewById(R.id.saveButton);
+        removeButton = (Button) myFragmentView.findViewById(R.id.removeButton);
 
         if(nextButton == null) {
             System.out.println("UHOH");
@@ -77,13 +75,22 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
             }
         });
 
-        if(GlobalList.getGlobalInstance().getCurrMap().getImageList().size() > 0) {
-            text.setText(GlobalList.getGlobalInstance().getCurrImage().getImagePath());
-        } else {
-            text.setText("NONE");
+        if(text != null) {
+            if (GlobalList.getGlobalInstance().getCurrMap().getImageList().size() > 0) {
+                if(GlobalList.getGlobalInstance().getCurrImage() == null) {
+                    System.out.println("THIS IS NULL");
+                }
+                else {
+                    text.setText(GlobalList.getGlobalInstance().getCurrImage().getImagePath());
+                }
+            } else {
+                text.setText("NONE");
+            }
         }
 
         setImage();
+
+        return myFragmentView;
     }
 
     public void nextImage() {
@@ -106,37 +113,22 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     public void setImage() {
         if(GlobalList.getGlobalInstance().getCurrImage() != null) {
 
-            ImageView imageView = ((ImageView) findViewById(R.id.imageView));
+            ImageView imageView = ((ImageView) myFragmentView.findViewById(R.id.imageView));
             if (imageView != null) {
                 imageView.setImageURI(Uri.parse(GlobalList.getGlobalInstance().getCurrImage().getImagePath()));
             }
         }
     }
 
-
-    /* Add the current Map to the end of Global List. Then write to shared prefs */
-    private void saveMapToPrefs() {
-        List<ImageMap> currMapList = GlobalList.getGlobalInstance().getCurrMapList();
-        currMapList.add(GlobalList.getGlobalInstance().getCurrMap());
-
-        Gson gson = new Gson();
-        String json = gson.toJson(currMapList);
-
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("test", json);
-        editor.commit();
-    }
-
     /* display the edit map name dialog */
     private void showEditDialog(){
-        FragmentManager fm = getSupportFragmentManager();
+        FragmentManager fm = getFragmentManager();
         MapNameDialog mapNameDialog = MapNameDialog.newInstance("Set Map Name");
         mapNameDialog.show(fm, "fragment_map_name");
     }
 
     private void showRemoveDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
 
         // set title
         alertDialogBuilder.setTitle("Remove Image");
@@ -190,33 +182,17 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         saveMapToPrefs();
     }
 
-    private void setGlobalImages() {
-        ImageMap currMap = GlobalList.getGlobalInstance().getCurrMap();
-        if(!currMap.isEmpty()) {
-            GlobalList.getGlobalInstance().setCurrImage(currMap.getImageList().get(0));
-            GlobalList.getGlobalInstance().setCurrImageIndex(0);
-        }
-    }
+    /* Add the current Map to the end of Global List. Then write to shared prefs */
+    private void saveMapToPrefs() {
+        List<ImageMap> currMapList = GlobalList.getGlobalInstance().getCurrMapList();
+        currMapList.add(GlobalList.getGlobalInstance().getCurrMap());
 
-    private void createMapView() {
-        /**
-         * Catch the null pointer exception that
-         * may be thrown when initialising the map
-         */
-        try {
-            if(null == map){
-               map = ((MapFragment) getFragmentManager().findFragmentById(
-                        R.id.mapView)).getMap();
+        Gson gson = new Gson();
+        String json = gson.toJson(currMapList);
 
-                /**
-                 * If the map is still null after attempted initialisation,
-                 * show an error to the user
-                 */
-                if(null == map) {
-
-                }
-            }
-        } catch (NullPointerException exception){
-        }
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("test", json);
+        editor.commit();
     }
 }

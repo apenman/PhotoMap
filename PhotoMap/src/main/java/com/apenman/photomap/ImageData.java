@@ -32,22 +32,17 @@ public class ImageData implements Serializable {
             /*********** PRODUCING NULL RESULTS WE NEED TO FIX ************/
             ExifInterface exif = new ExifInterface(path);
             if(exif != null) {
-                Random random = new Random();
-//                float af[] = {
-//                        -100F + 200F * random.nextFloat(), -100F + 200F * random.nextFloat()
-//                };
-//                exif.getLatLong(af);
-//                float f = af[0];
-//                float f1 = af[1];
-//                latLng = new LatLng(0.0, 0.0);
-//
-//                String LATITUDE = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
-//                String LATITUDE_REF = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);
-//                String LONGITUDE = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
-//                String LONGITUDE_REF = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
-//
-//                System.out.println("LATITUDE = " + LATITUDE);
-//                System.out.println("LONGITUDE = " + LONGITUDE);
+                LatLng latLng;
+
+                String LATITUDE = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+                String LATITUDE_REF = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);
+                String LONGITUDE = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
+                String LONGITUDE_REF = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
+
+                System.out.println("LATITUDE = " + LATITUDE);
+                System.out.println("LONGITUDE = " + LONGITUDE);
+                System.out.println("LATITUDE REF = " + LATITUDE_REF);
+                System.out.println("LONGITUDE REF= " + LONGITUDE_REF);
             }else
             {
                 System.out.println("WAS NULL");
