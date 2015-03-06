@@ -1,17 +1,28 @@
 package com.apenman.photomap;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Button;
 import android.net.Uri;
+
+import com.facebook.Session;
+import com.facebook.SessionState;
+import com.facebook.UiLifecycleHelper;
+import com.facebook.widget.LoginButton;
 import com.google.android.gms.maps.*;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -19,18 +30,29 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Created by apenman on 1/23/15.
  */
-public class DisplayActivity extends FragmentActivity implements MapNameDialog.MapNameDialogListener {
+public class DisplayActivity extends FragmentActivity implements MapNameDialog.MapNameDialogListener, FacebookLogInDialog.FacebookDialogListener {
     TextView text;
-    Button nextButton, prevButton, saveButton, removeButton;
+    Button nextButton, prevButton, saveButton, removeButton, shareButton;
     GoogleMap map;
+    private UiLifecycleHelper uiHelper;
+    private Session.StatusCallback callback =
+            new Session.StatusCallback() {
+                @Override
+                public void call(Session session,
+                                 SessionState state, Exception exception) {
+                }
+            };
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -38,12 +60,15 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         setContentView(R.layout.activity_display);
         setGlobalImages();
         createMapView();
+        uiHelper = new UiLifecycleHelper(this, callback);
+        uiHelper.onCreate(savedInstanceState);
 
         text = (TextView) findViewById(R.id.test);
         nextButton = (Button) findViewById(R.id.nextButton);
         prevButton = (Button) findViewById(R.id.prevButton);
         saveButton = (Button) findViewById(R.id.saveButton);
         removeButton = (Button) findViewById(R.id.removeButton);
+        shareButton = (Button) findViewById(R.id.shareButton);
 
         if(nextButton == null) {
             System.out.println("UHOH");
@@ -78,6 +103,14 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
             public void onClick(View v) {
                 System.out.println("REMOVING");
                 showRemoveDialog();
+            }
+        });
+
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("SHARING");
+                showShareDialog();
             }
         });
 
@@ -172,6 +205,28 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         alertDialog.show();
     }
 
+    private void showShareDialog() {
+        Session session = Session.getActiveSession();
+
+        if (session != null && session.isOpened()) {
+            // if the session is already open,
+            // try to show the selection fragment
+            System.out.println("HOW DOES THIS HAPPEN???");
+        } else {
+            // otherwise present the splash screen
+            // and ask the person to login.
+            System.out.println("NO SESSION");
+            // custom dialog
+            final Dialog dialog = new Dialog(this);
+            dialog.setContentView(R.layout.facebook_login);
+            dialog.setTitle("Facebook Login");
+
+            LoginButton login = (LoginButton) dialog.findViewById(R.id.login_button);
+            login.setPublishPermissions(Arrays.asList("publish_actions", "user_photos"));
+            dialog.show();
+        }
+    }
+
     /* This is called when 'OK' is pressed on AlertDialog when saving map */
     @Override
     public void onFinishMapDialog(String mapName, String mapDescription) {
@@ -194,7 +249,11 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         saveMapToPrefs();
     }
 
-    private void setGlobalImages() {
+    @Override
+    public void onFinishFacebookDialog(boolean success) {
+    }
+
+        private void setGlobalImages() {
         ImageMap currMap = GlobalList.getGlobalInstance().getCurrMap();
         if(!currMap.isEmpty()) {
             GlobalList.getGlobalInstance().setCurrImage(currMap.getImageList().get(0));
@@ -238,4 +297,35 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
             GlobalList.getGlobalInstance().getMap().animateCamera(CameraUpdateFactory.newLatLng(markerList.get(0).getPosition()));
         }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        uiHelper.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        uiHelper.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        uiHelper.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        uiHelper.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        uiHelper.onActivityResult(requestCode, resultCode, data);
+    }
+
 }

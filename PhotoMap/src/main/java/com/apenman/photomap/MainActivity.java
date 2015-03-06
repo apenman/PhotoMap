@@ -2,16 +2,22 @@ package com.apenman.photomap;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
 import java.text.ParseException;
 import java.util.Calendar;
 
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.media.ExifInterface;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.util.Base64;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -25,6 +31,7 @@ import java.util.Date;
 import android.database.Cursor;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.facebook.AppEventsLogger;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -243,7 +250,7 @@ public class MainActivity extends Activity implements OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-
+        AppEventsLogger.activateApp(this);
         getSavedLists((ListView) findViewById(R.id.listview));
     }
 
