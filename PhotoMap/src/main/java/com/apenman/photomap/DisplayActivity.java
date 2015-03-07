@@ -2,11 +2,14 @@ package com.apenman.photomap;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
@@ -18,10 +21,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Button;
 import android.net.Uri;
+import com.facebook.*;
+
 
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
+import com.facebook.android.AsyncFacebookRunner;
+import com.facebook.model.GraphObject;
 import com.facebook.widget.LoginButton;
 import com.google.android.gms.maps.*;
 
@@ -30,6 +37,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -41,10 +55,11 @@ import java.util.List;
 /**
  * Created by apenman on 1/23/15.
  */
-public class DisplayActivity extends FragmentActivity implements MapNameDialog.MapNameDialogListener, FacebookLogInDialog.FacebookDialogListener {
+public class DisplayActivity extends FragmentActivity implements MapNameDialog.MapNameDialogListener, FacebookUploadDialog.FacebookUploadDialogListener {
     TextView text;
     Button nextButton, prevButton, saveButton, removeButton, shareButton;
     GoogleMap map;
+    Dialog facebookDialog;
     private UiLifecycleHelper uiHelper;
     private Session.StatusCallback callback =
             new Session.StatusCallback() {
@@ -172,6 +187,13 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         mapNameDialog.show(fm, "fragment_map_name");
     }
 
+    /* display the facebook upload dialog */
+    private void showFacebookUploadDialog(){
+        FragmentManager fm = getSupportFragmentManager();
+        FacebookUploadDialog facebookDialog = FacebookUploadDialog.newInstance("title", "idk");
+        facebookDialog.show(fm, "fragment_map_name");
+    }
+
     private void showRemoveDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
@@ -212,18 +234,19 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
             // if the session is already open,
             // try to show the selection fragment
             System.out.println("HOW DOES THIS HAPPEN???");
+            showFacebookUploadDialog();
         } else {
             // otherwise present the splash screen
             // and ask the person to login.
             System.out.println("NO SESSION");
             // custom dialog
-            final Dialog dialog = new Dialog(this);
-            dialog.setContentView(R.layout.facebook_login);
-            dialog.setTitle("Facebook Login");
+            facebookDialog = new Dialog(this);
+            facebookDialog.setContentView(R.layout.facebook_login);
+            facebookDialog.setTitle("Facebook Login");
 
-            LoginButton login = (LoginButton) dialog.findViewById(R.id.login_button);
-            login.setPublishPermissions(Arrays.asList("publish_actions", "user_photos"));
-            dialog.show();
+            LoginButton login = (LoginButton) facebookDialog.findViewById(R.id.login_button);
+            login.setPublishPermissions(Arrays.asList("publish_actions"));
+            facebookDialog.show();
         }
     }
 
@@ -250,15 +273,36 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     }
 
     @Override
-    public void onFinishFacebookDialog(boolean success) {
+    public void onFinishFacebookDialog(String titleText, String descText) {
+        System.out.println("PRESSED OKAY");
+//        byte[] data = null;
+//        try {
+//            ContentResolver cr = this.getContentResolver();
+//            InputStream fis = new FileInputStream(GlobalList.getGlobalInstance().getCurrImage().getImagePath());
+//            Bitmap bi = BitmapFactory.decodeStream(fis);
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            bi.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//            data = baos.toByteArray();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//        Bundle params = new Bundle();
+//        params.putString("method", "photos.upload");
+//        params.putByteArray("picture", data);
+//
+//        AsyncFacebookRunner mAsyncRunner = new AsyncFacebookRunner(facebook);
+//        mAsyncRunner.request(null, params, "POST", new SampleUploadListener());
+//        postPhoto();
+        createAlbum();
     }
 
-        private void setGlobalImages() {
-        ImageMap currMap = GlobalList.getGlobalInstance().getCurrMap();
-        if(!currMap.isEmpty()) {
-            GlobalList.getGlobalInstance().setCurrImage(currMap.getImageList().get(0));
-            GlobalList.getGlobalInstance().setCurrImageIndex(0);
-        }
+    private void setGlobalImages() {
+    ImageMap currMap = GlobalList.getGlobalInstance().getCurrMap();
+    if(!currMap.isEmpty()) {
+        GlobalList.getGlobalInstance().setCurrImage(currMap.getImageList().get(0));
+        GlobalList.getGlobalInstance().setCurrImageIndex(0);
+    }
     }
 
     private void createMapView() {
@@ -326,6 +370,42 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         uiHelper.onActivityResult(requestCode, resultCode, data);
+        Session session = Session.getActiveSession();
+
+        if(facebookDialog != null && session != null && session.isOpened()) {
+            facebookDialog.dismiss();
+            showFacebookUploadDialog();
+        }
     }
 
+    private void createAlbum() {
+        Request.Callback requestCallBack = null;
+        try {
+            requestCallBack = new Request.Callback() {
+                @Override
+                public void onCompleted(Response response) {
+                    JSONObject graphResponse = response.getGraphObject().getInnerJSONObject();
+                    String postId = null;
+                    try {
+                        postId = graphResponse.getString("id");
+                        /* if successful, iterate over map and add each photo to the album */
+                        GlobalList.getGlobalInstance().resetUploadCounter();
+                        GlobalList.getGlobalInstance().uploadImages(postId, Session.getActiveSession());
+                    } catch(Exception e) {
+                        System.out.println("RETRIEVING POST ID FAILED");
+                    }
+                }
+            };
+        } catch(Exception e) {
+            System.out.println("CALLBACK FAILED");
+        }
+        Session session = Session.getActiveSession();
+        Bundle bundle = new Bundle();
+        bundle.putString("name", "My Test Album");
+        bundle.putString("message", "Working on senior project lol :-)");
+        Request request = new com.facebook.Request(session, "me/albums", bundle, HttpMethod.POST, requestCallBack);
+
+        RequestAsyncTask requestAsyncTask = new RequestAsyncTask(request);
+        requestAsyncTask.execute();
+    }
 }

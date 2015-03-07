@@ -1,9 +1,25 @@
 package com.apenman.photomap;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+
+import com.facebook.HttpMethod;
+import com.facebook.Request;
+import com.facebook.RequestAsyncTask;
+import com.facebook.Response;
+import com.facebook.Session;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -17,6 +33,7 @@ public class GlobalList {
     private static int currImageIndex;
     private static List<Marker> markerList;
     private static GoogleMap map;
+    private static int uploadCounter;
 
 
 
@@ -113,4 +130,65 @@ public class GlobalList {
     }
 
     public static GoogleMap getMap() { return map; }
+
+    public static void resetUploadCounter() { uploadCounter = 0; }
+
+    public static boolean uploadImages(final String albumId, final Session session) {
+        Bitmap bi;
+        ByteArrayOutputStream stream;
+        InputStream fis;
+        Request request;
+        String albumPath = albumId + "/photos";
+
+        System.out.println("UPLOADING IMAGE #" + uploadCounter);
+        if(uploadCounter <= currMap.getImageList().size()) {
+            String imgPath = currMap.getImageList().get(uploadCounter).getImagePath();
+            uploadCounter++;
+
+            Request.Callback requestCallBack = null;
+            try {
+                requestCallBack = new Request.Callback() {
+                    @Override
+                    public void onCompleted(Response response) {
+                        JSONObject graphResponse = response.getGraphObject().getInnerJSONObject();
+                        String postId = null;
+                        try {
+                            /* if successful, iterate over map and add each photo to the album */
+                            uploadImages(albumId, session);
+                        } catch(Exception e) {
+                            System.out.println("RETRIEVING POST ID FAILED");
+                        }
+                    }
+                };
+            } catch(Exception e) {
+                System.out.println("CALLBACK FAILED");
+            }
+
+
+            try {
+                System.out.println("NEW IMG");
+
+                fis = new FileInputStream(imgPath);
+
+                Bitmap bm = BitmapFactory.decodeStream(fis);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] b = baos.toByteArray();
+                fis.close();
+                baos.close();
+                Bundle bundle = new Bundle();
+                bundle.putByteArray("source", b);
+                request = new Request(session, albumPath, bundle, HttpMethod.POST, requestCallBack);
+                RequestAsyncTask requestAsyncTask = new RequestAsyncTask(request);
+
+                requestAsyncTask.execute();
+            } catch (FileNotFoundException e) {
+                System.out.println("FILE NOT FOUND");
+            } catch (IOException e) {
+                System.out.println("IO EXCEPTION");
+            }
+        }
+
+        return true;
+    }
 }
