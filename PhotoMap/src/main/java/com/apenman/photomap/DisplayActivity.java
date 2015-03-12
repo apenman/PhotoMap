@@ -2,50 +2,29 @@ package com.apenman.photomap;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Button;
 import android.net.Uri;
 import com.facebook.*;
-
-
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
-import com.facebook.android.AsyncFacebookRunner;
-import com.facebook.model.GraphObject;
 import com.facebook.widget.LoginButton;
 import com.google.android.gms.maps.*;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
-
 import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -275,26 +254,7 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     @Override
     public void onFinishFacebookDialog(String titleText, String descText) {
         System.out.println("PRESSED OKAY");
-//        byte[] data = null;
-//        try {
-//            ContentResolver cr = this.getContentResolver();
-//            InputStream fis = new FileInputStream(GlobalList.getGlobalInstance().getCurrImage().getImagePath());
-//            Bitmap bi = BitmapFactory.decodeStream(fis);
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            bi.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//            data = baos.toByteArray();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//
-//        Bundle params = new Bundle();
-//        params.putString("method", "photos.upload");
-//        params.putByteArray("picture", data);
-//
-//        AsyncFacebookRunner mAsyncRunner = new AsyncFacebookRunner(facebook);
-//        mAsyncRunner.request(null, params, "POST", new SampleUploadListener());
-//        postPhoto();
-        createAlbum();
+        createAlbum(titleText, descText);
     }
 
     private void setGlobalImages() {
@@ -378,8 +338,11 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         }
     }
 
-    private void createAlbum() {
+    private void createAlbum(String titleText, String descText) {
+        Session session = Session.getActiveSession();
+        Bundle bundle = new Bundle();
         Request.Callback requestCallBack = null;
+
         try {
             requestCallBack = new Request.Callback() {
                 @Override
@@ -399,10 +362,20 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         } catch(Exception e) {
             System.out.println("CALLBACK FAILED");
         }
-        Session session = Session.getActiveSession();
-        Bundle bundle = new Bundle();
-        bundle.putString("name", "My Test Album");
-        bundle.putString("message", "Working on senior project lol :-)");
+
+        ImageMap map = GlobalList.getGlobalInstance().getCurrMap();
+        System.out.println("MAP NAME = " + map.getName());
+        System.out.println("MAP DESC = " + map.getDescription());
+
+        if(titleText == "") {
+            titleText = "My PhotoMap";
+        }
+        if(descText == "") {
+            descText = "Posted from Alex's cool senior project";
+        }
+
+        bundle.putString("name", titleText);
+        bundle.putString("message", descText);
         Request request = new com.facebook.Request(session, "me/albums", bundle, HttpMethod.POST, requestCallBack);
 
         RequestAsyncTask requestAsyncTask = new RequestAsyncTask(request);

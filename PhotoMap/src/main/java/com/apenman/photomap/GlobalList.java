@@ -173,9 +173,13 @@ public class GlobalList {
                 Bitmap bm = BitmapFactory.decodeStream(fis);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                bm.recycle();
+
                 byte[] b = baos.toByteArray();
+
                 fis.close();
                 baos.close();
+
                 Bundle bundle = new Bundle();
                 bundle.putByteArray("source", b);
                 request = new Request(session, albumPath, bundle, HttpMethod.POST, requestCallBack);
