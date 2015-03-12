@@ -18,13 +18,34 @@ import com.google.gson.annotations.SerializedName;
 public class ImageData implements Serializable {
     @SerializedName("image_path")
     private String imagePath;
+    @SerializedName("image_name")
+    private String imageName;
+    @SerializedName("image_size")
+    private int imageSize;
+    @SerializedName("date_taken")
+    private String dateTaken;
+    @SerializedName("description")
+    private String description;
     @SerializedName("lat")
     private Float lat = null;
     @SerializedName("lng")
     private Float lng = null;
 
-    public ImageData(String path) {
-        imagePath = path;
+    public ImageData(String path, String name, int size, String date) {
+        if(path != null)
+            imagePath = path;
+        else
+            imagePath = "";
+        if(name != null)
+            imageName = name;
+        else
+            imageName = "";
+        imageSize = size;
+        if(date != null)
+            dateTaken = date;
+        else
+            dateTaken = "";
+        description = "";
         /* SET THESE TO ZERO FOR NOW */
         try {
             /*********** PRODUCING NULL RESULTS WE NEED TO FIX ************/
@@ -69,12 +90,24 @@ public class ImageData implements Serializable {
         return imagePath;
     }
 
+    public String getImageName() { return imageName; }
+
+    public String getDateTaken() { return dateTaken; }
+
+    public String getDescription() { return description; }
+
+    public int getImageSize() { return imageSize; }
+
     public Float getLat() {
         return lat;
     }
 
     public Float getLng() {
         return lng;
+    }
+
+    public void setDescription(String desc) {
+        description = desc;
     }
 
     /* Found at:

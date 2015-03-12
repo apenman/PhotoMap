@@ -60,6 +60,6 @@ public class ImageMap {
 
     @Override
     public String toString() {
-        return "NAME: " + name + "\n" + description;
+        return name + "\n" + description;
     }
 }

@@ -1,5 +1,6 @@
 package com.apenman.photomap;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.security.MessageDigest;
@@ -14,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.media.ExifInterface;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -65,6 +67,7 @@ public class MainActivity extends Activity implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        GlobalList.getGlobalInstance().setContext(getApplicationContext());
 
         btnCalendarFrom = (Button) findViewById(R.id.btnCalendarFrom);
         btnCalendarTo = (Button) findViewById(R.id.btnCalendarTo);
@@ -217,7 +220,7 @@ public class MainActivity extends Activity implements OnClickListener {
                     curDate = sdf.parse(timestamp);
                     if(curDate.after(dateFrom) && dateTo.after(curDate)) {
 //                        image_list[index] = new ImageData(path);
-                        templist.add(new ImageData(path));
+                        templist.add(createImageDataFromPath(path));
                     }
                 }
             } catch(IOException e) {
@@ -252,6 +255,8 @@ public class MainActivity extends Activity implements OnClickListener {
         super.onResume();
         AppEventsLogger.activateApp(this);
         getSavedLists((ListView) findViewById(R.id.listview));
+        GlobalList.getGlobalInstance().setContext(getApplicationContext());
+
     }
 
     @Override
@@ -292,5 +297,22 @@ public class MainActivity extends Activity implements OnClickListener {
         ArrayAdapter<ImageMap> adapter = new ArrayAdapter<ImageMap>(this,
                 android.R.layout.simple_list_item_1, currMapList);
         listView.setAdapter(adapter);
+    }
+
+    private ImageData createImageDataFromPath(String path) {
+        try {
+            ExifInterface exif = new ExifInterface(path);
+
+            String datetime = exif.getAttribute(ExifInterface.TAG_DATETIME);
+            File file = new File(path);
+            int file_size = Integer.parseInt(String.valueOf(file.length()/1024));
+            Uri uri = Uri.parse(file.toString());
+            String filename = uri.getLastPathSegment();
+
+            return new ImageData(path, filename, file_size, datetime);
+        }
+        catch (IOException e) {
+        }
+        return null;
     }
 }

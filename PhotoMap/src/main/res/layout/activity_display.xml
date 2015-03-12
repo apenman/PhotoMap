@@ -52,7 +52,7 @@
 
         <TextView android:textColor="#fff" android:textSize="20dp"
             android:layout_height="wrap_content" android:id="@+id/test"
-            android:text="Hi There" android:layout_width="wrap_content"
+            android:text="" android:layout_width="wrap_content"
             android:layout_gravity="center_horizontal" android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:layout_below="@+id/saveButton"
@@ -66,7 +66,120 @@
             android:adjustViewBounds="true"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/test" />
+            android:layout_below="@+id/test"
+            android:layout_alignRight="@+id/test" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="File Name:"
+            android:id="@+id/textView"
+            android:layout_alignTop="@+id/imageView"
+            android:layout_toRightOf="@+id/test" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="File Path:"
+            android:id="@+id/textView3"
+            android:layout_below="@+id/textView"
+            android:layout_toRightOf="@+id/test" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="File Size:"
+            android:id="@+id/textView4"
+            android:layout_below="@+id/textView3"
+            android:layout_toRightOf="@+id/test" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Date Taken:"
+            android:id="@+id/textView5"
+            android:layout_below="@+id/textView4"
+            android:layout_toRightOf="@+id/imageView" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="GPS Coordinates:"
+            android:id="@+id/textView6"
+            android:layout_below="@+id/textView5"
+            android:layout_toRightOf="@+id/imageView" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Description:"
+            android:id="@+id/textView7"
+            android:layout_below="@+id/textView6"
+            android:layout_toRightOf="@+id/imageView" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=""
+            android:id="@+id/nameTextView"
+            android:layout_alignTop="@+id/textView"
+            android:layout_alignParentRight="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=""
+            android:id="@+id/pathTextView"
+            android:layout_alignTop="@+id/textView3"
+            android:layout_alignParentRight="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=""
+            android:id="@+id/sizeTextView"
+            android:layout_alignTop="@+id/textView4"
+            android:layout_alignParentRight="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=""
+            android:id="@+id/dateTextView"
+            android:layout_alignTop="@+id/textView5"
+            android:layout_alignParentRight="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=""
+            android:id="@+id/gpsTextView"
+            android:layout_alignTop="@+id/textView6"
+            android:layout_alignParentRight="true" />
+
+        <!-- Linear Layout to take focus from edit text-->
+        <LinearLayout android:focusable="true"
+            android:focusableInTouchMode="true" android:layout_width="0px"
+            android:layout_height="0px" />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/editDescText"
+            android:layout_alignTop="@+id/textView7"
+            android:layout_toRightOf="@+id/textView6"
+            android:layout_alignParentRight="true"
+            android:cursorVisible="false"/>
     </RelativeLayout>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
