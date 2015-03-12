@@ -292,6 +292,5 @@ public class MainActivity extends Activity implements OnClickListener {
         ArrayAdapter<ImageMap> adapter = new ArrayAdapter<ImageMap>(this,
                 android.R.layout.simple_list_item_1, currMapList);
         listView.setAdapter(adapter);
-
     }
 }

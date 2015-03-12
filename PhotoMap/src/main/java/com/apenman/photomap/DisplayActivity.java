@@ -20,6 +20,7 @@ import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.LoginButton;
 import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -136,7 +137,6 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
 
     public void setImage() {
         if(GlobalList.getGlobalInstance().getCurrImage() != null) {
-
             ImageView imageView = ((ImageView) findViewById(R.id.imageView));
             if (imageView != null) {
                 imageView.setImageURI(Uri.parse(GlobalList.getGlobalInstance().getCurrImage().getImagePath()));
@@ -258,11 +258,14 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
     }
 
     private void setGlobalImages() {
-    ImageMap currMap = GlobalList.getGlobalInstance().getCurrMap();
-    if(!currMap.isEmpty()) {
-        GlobalList.getGlobalInstance().setCurrImage(currMap.getImageList().get(0));
-        GlobalList.getGlobalInstance().setCurrImageIndex(0);
-    }
+        ImageMap currMap = GlobalList.getGlobalInstance().getCurrMap();
+        if(!currMap.isEmpty()) {
+            GlobalList.getGlobalInstance().setCurrImage(currMap.getImageList().get(0));
+            GlobalList.getGlobalInstance().setCurrImageIndex(0);
+        }
+        else {
+            GlobalList.getGlobalInstance().setCurrImage(null);
+        }
     }
 
     private void createMapView() {
@@ -291,15 +294,29 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
         List<ImageData> list = GlobalList.getGlobalInstance().getCurrMap().getImageList();
 
         for (ImageData img : list) {
-            Marker newMark = GlobalList.getGlobalInstance().getMap().addMarker(new MarkerOptions().position(new LatLng(img.getLat(), img.getLng())));
+            Marker newMark = null;
+            if(img.getLat() != null && img.getLng() != null) {
+                newMark = GlobalList.getGlobalInstance().getMap().addMarker(new MarkerOptions().position(new LatLng(img.getLat(), img.getLng())));
+            }
             markerList.add(newMark);
         }
 
         GlobalList.getGlobalInstance().setMarkerList(markerList);
         System.out.println("MARKER LIST SIZE IS: " + markerList.size());
-        if(list.size() > 0) {
-            GlobalList.getGlobalInstance().getMap().animateCamera(CameraUpdateFactory.newLatLng(markerList.get(0).getPosition()));
+//        if(list.size() > 0) {
+//            GlobalList.getGlobalInstance().getMap().animateCamera(CameraUpdateFactory.newLatLng(markerList.get(0).getPosition()));
+//        }
+        for(int i = 0; i < list.size(); i++) {
+            if(markerList.get(i) != null) {
+                GlobalList.getGlobalInstance().getMap().animateCamera(CameraUpdateFactory.newLatLng(markerList.get(i).getPosition()));
+            }
         }
+
+        /* If there is a marker for the first image */
+//        if(markerList.get(0) != null) {
+//            /* Set the color to blue (highlight it) */
+////            markerList.get(0).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+//        }
     }
 
     @Override

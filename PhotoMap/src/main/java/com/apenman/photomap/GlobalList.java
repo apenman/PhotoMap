@@ -11,7 +11,9 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONObject;
 
@@ -34,6 +36,7 @@ public class GlobalList {
     private static List<Marker> markerList;
     private static GoogleMap map;
     private static int uploadCounter;
+    private static int successUploadCounter;
 
 
 
@@ -76,7 +79,15 @@ public class GlobalList {
                 currImageIndex += 1;
             }
             currImage = currMap.getImageList().get(currImageIndex);
-            map.animateCamera(CameraUpdateFactory.newLatLng(markerList.get(currImageIndex).getPosition()));
+
+            if(markerList.get(currImageIndex) != null) {
+                map.animateCamera(CameraUpdateFactory.newLatLng(markerList.get(currImageIndex).getPosition()));
+                // Zoom in, animating the camera.
+//                map.animateCamera(CameraUpdateFactory.zoomIn());
+                // Zoom out to zoom level 10, animating with a duration of 2 seconds.
+//                map.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+//                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            }
             return true;
         }
 
@@ -92,7 +103,15 @@ public class GlobalList {
                 currImageIndex -= 1;
             }
             currImage = currMap.getImageList().get(currImageIndex);
-            map.animateCamera(CameraUpdateFactory.newLatLng(markerList.get(currImageIndex).getPosition()));
+
+            if(markerList.get(currImageIndex) != null) {
+                map.animateCamera(CameraUpdateFactory.newLatLng(markerList.get(currImageIndex).getPosition()));
+                // Zoom in, animating the camera.
+//                map.animateCamera(CameraUpdateFactory.zoomIn());
+                // Zoom out to zoom level 10, animating with a duration of 2 seconds.
+//                map.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+//                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            }
             return true;
         }
 
@@ -109,7 +128,14 @@ public class GlobalList {
                 currImageIndex = currMap.getImageList().size() -1;
             }
             currImage = currMap.getImageList().get(currImageIndex);
-            map.animateCamera(CameraUpdateFactory.newLatLng(markerList.get(currImageIndex).getPosition()));
+            if(markerList.get(currImageIndex) != null) {
+                map.animateCamera(CameraUpdateFactory.newLatLng(markerList.get(currImageIndex).getPosition()));
+                // Zoom in, animating the camera.
+//                map.animateCamera(CameraUpdateFactory.zoomIn());
+                // Zoom out to zoom level 10, animating with a duration of 2 seconds.
+//                map.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+//                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            }
         }
     }
 
@@ -131,7 +157,7 @@ public class GlobalList {
 
     public static GoogleMap getMap() { return map; }
 
-    public static void resetUploadCounter() { uploadCounter = 0; }
+    public static void resetUploadCounter() { uploadCounter = 1; successUploadCounter = 1; }
 
     public static boolean uploadImages(final String albumId, final Session session) {
         Bitmap bi;
@@ -155,8 +181,10 @@ public class GlobalList {
                         try {
                             /* if successful, iterate over map and add each photo to the album */
                             uploadImages(albumId, session);
+                            checkCounter();
                         } catch(Exception e) {
                             System.out.println("RETRIEVING POST ID FAILED");
+                            checkCounter();
                         }
                     }
                 };
@@ -186,6 +214,7 @@ public class GlobalList {
                 RequestAsyncTask requestAsyncTask = new RequestAsyncTask(request);
 
                 requestAsyncTask.execute();
+                System.out.println("DONE!!!");
             } catch (FileNotFoundException e) {
                 System.out.println("FILE NOT FOUND");
             } catch (IOException e) {
@@ -194,5 +223,17 @@ public class GlobalList {
         }
 
         return true;
+    }
+
+    private static boolean checkCounter() {
+        successUploadCounter++;
+        System.out.println("CHECKING UPLOAD #" + successUploadCounter + " of " + currMap.getImageList().size());
+
+        if(successUploadCounter == currMap.getImageList().size()) {
+            System.out.println("COMPLETELY DONE");
+            return true;
+        }
+
+        return false;
     }
 }

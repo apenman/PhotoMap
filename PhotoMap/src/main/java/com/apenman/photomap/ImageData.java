@@ -19,15 +19,13 @@ public class ImageData implements Serializable {
     @SerializedName("image_path")
     private String imagePath;
     @SerializedName("lat")
-    private Float lat;
+    private Float lat = null;
     @SerializedName("lng")
-    private Float lng;
+    private Float lng = null;
 
     public ImageData(String path) {
         imagePath = path;
         /* SET THESE TO ZERO FOR NOW */
-        lat = 0.0f;
-        lng = 0.0f;
         try {
             /*********** PRODUCING NULL RESULTS WE NEED TO FIX ************/
             ExifInterface exif = new ExifInterface(path);
@@ -61,7 +59,6 @@ public class ImageData implements Serializable {
             }else
             {
                 System.out.println("WAS NULL");
-//                latLng = new LatLng(0.0D, 0.0D);
             }
         } catch (IOException e) {
             e.printStackTrace();
