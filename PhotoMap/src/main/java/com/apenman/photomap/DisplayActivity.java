@@ -303,20 +303,12 @@ public class DisplayActivity extends FragmentActivity implements MapNameDialog.M
 
         GlobalList.getGlobalInstance().setMarkerList(markerList);
         System.out.println("MARKER LIST SIZE IS: " + markerList.size());
-//        if(list.size() > 0) {
-//            GlobalList.getGlobalInstance().getMap().animateCamera(CameraUpdateFactory.newLatLng(markerList.get(0).getPosition()));
-//        }
+
         for(int i = 0; i < list.size(); i++) {
             if(markerList.get(i) != null) {
                 GlobalList.getGlobalInstance().getMap().animateCamera(CameraUpdateFactory.newLatLng(markerList.get(i).getPosition()));
             }
         }
-
-        /* If there is a marker for the first image */
-//        if(markerList.get(0) != null) {
-//            /* Set the color to blue (highlight it) */
-////            markerList.get(0).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-//        }
     }
 
     @Override
