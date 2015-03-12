@@ -193,17 +193,20 @@ public class GlobalList {
             }
 
 
+            byte[] b;
+            Bitmap bm;
+            ByteArrayOutputStream baos;
             try {
                 System.out.println("NEW IMG");
 
                 fis = new FileInputStream(imgPath);
 
-                Bitmap bm = BitmapFactory.decodeStream(fis);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bm = BitmapFactory.decodeStream(fis);
+                baos = new ByteArrayOutputStream();
                 bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 bm.recycle();
 
-                byte[] b = baos.toByteArray();
+                b = baos.toByteArray();
 
                 fis.close();
                 baos.close();
@@ -212,7 +215,6 @@ public class GlobalList {
                 bundle.putByteArray("source", b);
                 request = new Request(session, albumPath, bundle, HttpMethod.POST, requestCallBack);
                 RequestAsyncTask requestAsyncTask = new RequestAsyncTask(request);
-
                 requestAsyncTask.execute();
                 System.out.println("DONE!!!");
             } catch (FileNotFoundException e) {
